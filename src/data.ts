@@ -77,7 +77,7 @@ export const baseFeatures = [
 ];
 
 export const aboutHighlights = [
-  { icon: ShieldCheck, title: 'CAAC/AOPA 执照培训', desc: '官方认证课程体系，覆盖多旋翼全等级' },
+  { icon: ShieldCheck, title: 'CAAC 执照培训', desc: '官方认证课程体系，覆盖多旋翼全等级' },
   { icon: Cog, title: '设备组装与出口', desc: '专业组装能力，面向国内外市场' },
   { icon: Award, title: '技术先行者', desc: '深耕低空经济领域，行业经验丰富' },
 ];
