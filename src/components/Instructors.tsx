@@ -1,19 +1,23 @@
-import { UserCircle2 } from 'lucide-react';
-
 const instructors = [
   {
     name: '宋玖泽',
     title: '首席飞行教员',
+    image: '/images/songjiuze.jpg',
+    alt: '首席飞行教员宋玖泽',
     bio: 'CAAC 无人机驾驶员执照教员，累计安全飞行 5,000+ 小时。曾参与电力巡检、航拍测绘等多个行业项目，擅长零基础学员教学。',
   },
   {
     name: '张鑫鹏',
     title: '理论教学负责人',
+    image: '/images/zhangxinpeng.jpg',
+    alt: '理论教学负责人张鑫鹏',
     bio: '民航局认证理论教员，深耕飞行原理与航空气象教学 5 年。善于将复杂知识点拆解为易懂案例，帮助学员高效备考、一次通过。',
   },
   {
     name: '张凯',
     title: '行业应用导师',
+    image: '/images/zhangkai.jpg',
+    alt: '行业应用导师张凯',
     bio: '农业植保与航拍测绘方向资深讲师，持有多机型操作资质。曾为多家企业提供无人机作业培训，熟悉行业真实作业流程与就业需求。',
   },
 ];
@@ -42,9 +46,12 @@ export default function Instructors() {
               key={inst.name}
               className="group relative overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-nbyte-200/40"
             >
-              {/* Photo placeholder */}
-              <div className="relative flex h-56 items-center justify-center bg-gradient-to-br from-nbyte-50 to-nbyte-100">
-                <UserCircle2 className="h-20 w-20 text-nbyte-300 transition-colors group-hover:text-nbyte-400" />
+              <div className="relative h-56">
+                <img
+                  src={inst.image}
+                  alt={inst.alt}
+                  className="h-full w-full object-cover object-center"
+                />
               </div>
 
               {/* Info */}
