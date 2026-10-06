@@ -1,8 +1,8 @@
 const stats = [
-  { value: '10+', unit: '年', label: '深耕无人机行业，专注培训与技术服务' },
-  { value: '5,000+', unit: '名', label: '累计培训学员，覆盖全国多省市' },
-  { value: '98%', unit: '', label: '考证综合通过率，教学成果经得起检验' },
-  { value: '100+', unit: '家', label: '合作企业与就业推荐单位' },
+  { value: '5+', unit: '年', label: '深耕无人机行业，专注培训与技术服务' },
+  { value: '5,00+', unit: '名', label: '累计培训学员，覆盖全国多省市' },
+  { value: '78%', unit: '', label: '考证综合通过率，教学成果经得起检验' },
+  { value: '30+', unit: '家', label: '合作企业与就业推荐单位' },
 ];
 
 export default function Stats() {
@@ -35,9 +35,7 @@ export default function Stats() {
           <p className="mx-auto max-w-3xl text-sm leading-relaxed text-nbyte-300/60">
             新字节航空具备 CAAC 民用无人机驾驶员训练机构资质，培训体系符合民航局标准，证书全国通用、官网可查。
           </p>
-          <p className="mt-3 text-xs text-nbyte-400/40">
-            * 以上数据为示例占位，后续可替换为真实数据
-          </p>
+          <br />
         </div>
       </div>
     </section>
