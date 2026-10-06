@@ -64,8 +64,7 @@ export default function Base() {
             </h2>
             <p className="mt-6 text-base leading-relaxed text-gray-600">
               位于山东省潍坊市奎文区，拥有专业的空域申请能力和标准化的实飞场地。
-              基地配备多种型号真机设备，由资深教员全程带飞指导，确保每位学员都能
-              获得充分的实操训练时间。
+              基地配备多种型号真机设备，由资深教员全程带飞指导，确保每位学员都能获得充分的实操训练时间。
             </p>
 
             {/* Feature Tags */}

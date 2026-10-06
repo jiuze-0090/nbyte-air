@@ -60,7 +60,7 @@ export default function About() {
                 <div className="text-sm text-gray-600">
                   覆盖 CAAC 视距内 超视距
                   <br />
-                  全等级培训认证
+                  教员 全等级培训认证
                 </div>
               </div>
             </div>
