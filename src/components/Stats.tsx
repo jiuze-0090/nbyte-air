@@ -1,8 +1,8 @@
 const stats = [
-  { value: '5+', unit: '年', label: '深耕无人机行业，专注培训与技术服务' },
+  { value: '3+', unit: '年', label: '深耕无人机行业，专注培训与技术服务' },
   { value: '5,00+', unit: '名', label: '累计培训学员，覆盖全国多省市' },
   { value: '78%', unit: '', label: '考证综合通过率，教学成果经得起检验' },
-  { value: '30+', unit: '家', label: '合作企业与就业推荐单位' },
+  { value: '20+', unit: '家', label: '合作企业与就业推荐单位' },
 ];
 
 export default function Stats() {
