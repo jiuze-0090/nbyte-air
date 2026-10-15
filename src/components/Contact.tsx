@@ -93,6 +93,8 @@ export default function Contact() {
                     <img
                       src={qr.image}
                       alt={qr.label}
+                      loading="lazy"
+                      decoding="async"
                       className="h-full w-full object-contain"
                     />
                   </div>

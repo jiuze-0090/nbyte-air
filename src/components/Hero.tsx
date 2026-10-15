@@ -13,6 +13,10 @@ export default function Hero() {
         <img
           src={heroImage}
           alt="无人机飞行训练"
+          width={1600}
+          height={1067}
+          fetchPriority="high"
+          decoding="async"
           className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-nbyte-950/90 via-nbyte-900/70 to-nbyte-900/30" />

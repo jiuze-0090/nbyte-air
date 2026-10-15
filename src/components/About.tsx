@@ -49,6 +49,10 @@ export default function About() {
               <img
                 src={aboutImage}
                 alt="无人机培训实操"
+                width={1080}
+                height={720}
+                loading="lazy"
+                decoding="async"
                 className="h-[400px] w-full object-cover lg:h-[520px]"
               />
               <div className="absolute inset-0 bg-gradient-to-br from-nbyte-900/20 to-transparent" />

@@ -21,17 +21,15 @@ export const navLinks = [
   { label: '联系我们', id: 'contact' },
 ];
 
-export const heroImage =
-  'https://images.pexels.com/photos/442589/pexels-photo-442589.jpeg?auto=compress&cs=tinysrgb&w=1920';
+export const heroImage = '/images/hero.webp';
 
 export const baseImages = [
-  { src: '/images/base-practice.jpg', alt: '户外真机实操训练', caption: '户外真机实操训练' },
-  { src: '/images/base-flight.jpg', alt: '实飞演示与考核', caption: '实飞演示与考核' },
-  { src: '/images/base-classroom.jpg', alt: '理论授课与设备装调', caption: '理论授课与设备装调' },
+  { src: '/images/base-practice.webp', alt: '户外真机实操训练', caption: '户外真机实操训练', loading: 'lazy' },
+  { src: '/images/base-flight.webp', alt: '实飞演示与考核', caption: '实飞演示与考核', loading: 'lazy' },
+  { src: '/images/base-classroom.webp', alt: '理论授课与设备装调', caption: '理论授课与设备装调', loading: 'lazy' },
 ];
 
-export const aboutImage =
-  'https://images.pexels.com/photos/8459532/pexels-photo-8459532.jpeg?auto=compress&cs=tinysrgb&w=1280';
+export const aboutImage = '/images/about.webp';
 
 export type CourseModule = {
   icon: typeof BookOpen;

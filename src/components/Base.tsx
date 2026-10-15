@@ -16,6 +16,10 @@ export default function Base() {
                   <img
                     src={baseImages[0].src}
                     alt={baseImages[0].alt}
+                    width={1280}
+                    height={960}
+                    loading="lazy"
+                    decoding="async"
                     className="h-56 w-full object-cover sm:h-full sm:min-h-[420px]"
                   />
                 </div>
@@ -30,6 +34,10 @@ export default function Base() {
                   <img
                     src={baseImages[1].src}
                     alt={baseImages[1].alt}
+                    width={1280}
+                    height={960}
+                    loading="lazy"
+                    decoding="async"
                     className="h-40 w-full object-cover sm:h-[200px]"
                   />
                 </div>
@@ -44,6 +52,10 @@ export default function Base() {
                   <img
                     src={baseImages[2].src}
                     alt={baseImages[2].alt}
+                    width={1280}
+                    height={960}
+                    loading="lazy"
+                    decoding="async"
                     className="h-40 w-full object-cover sm:h-[200px]"
                   />
                 </div>
