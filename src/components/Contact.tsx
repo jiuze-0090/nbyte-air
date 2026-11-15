@@ -1,4 +1,6 @@
-import { Phone, MapPin, QrCode, Plane } from 'lucide-react';
+import { Phone, MapPin, QrCode, ArrowUpRight } from 'lucide-react';
+
+import LeadForm from '@/components/LeadForm';
 
 export default function Contact() {
   return (
@@ -28,6 +30,11 @@ export default function Contact() {
           <p className="mt-4 text-base leading-relaxed text-nbyte-200">
             立即联系我们，获取课程详情与报名优惠。专业团队为您全程规划。
           </p>
+        </div>
+
+        {/* 留资表单 */}
+        <div className="mt-14">
+          <LeadForm />
         </div>
 
         {/* Contact Cards */}
@@ -105,20 +112,25 @@ export default function Contact() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
 
-        {/* Footer Bar */}
-        <div className="mt-20 border-t border-white/10 pt-8 text-center">
-          <div className="flex items-center justify-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-nbyte-400 to-nbyte-600">
-              <Plane className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-bold text-white">新字节航空 Nbyte Air</span>
+            {/* 学习资源入口：报名前的理论准备可以先去实验室 */}
+            <a
+              href="https://lab.nbyteair.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 px-5 py-4 transition-all hover:border-accent-cyan/40 hover:bg-white/10"
+            >
+              <span>
+                <span className="block text-sm font-semibold text-white">
+                  报名前想先把理论学一学？
+                </span>
+                <span className="mt-1 block text-xs text-nbyte-300">
+                  低空原理实验室 · 9 个交互实验 · 97 条考点 · 免费公开
+                </span>
+              </span>
+              <ArrowUpRight className="h-5 w-5 shrink-0 text-accent-cyan" />
+            </a>
           </div>
-          <p className="mt-3 text-sm text-nbyte-400">
-            © 2026 新字节航空 · 专业的多旋翼无人机驾驶员培训基地
-          </p>
         </div>
       </div>
     </section>

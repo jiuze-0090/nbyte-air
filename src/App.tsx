@@ -4,7 +4,9 @@ import Stats from '@/components/Stats';
 import Courses from '@/components/Courses';
 import Base from '@/components/Base';
 import About from '@/components/About';
+import Faq from '@/components/Faq';
 import Contact from '@/components/Contact';
+import Footer from '@/components/Footer';
 
 function App() {
   return (
@@ -16,8 +18,10 @@ function App() {
         <Courses />
         <Base />
         <About />
+        <Faq />
         <Contact />
       </main>
+      <Footer />
     </div>
   );
 }

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# 本站为单页站点，所有可索引内容均在首页锚点内。
+Sitemap: https://www.nbyteair.com/sitemap.xml

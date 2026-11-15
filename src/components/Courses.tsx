@@ -1,4 +1,4 @@
-import { courseModules, applicationIcons } from '@/data';
+import { courseFacts, courseModules, applicationIcons } from '@/data';
 
 export default function Courses() {
   return (
@@ -15,6 +15,30 @@ export default function Courses() {
           <p className="mt-4 text-base leading-relaxed text-gray-600">
             从理论基础到行业实操，四大模块层层递进，全面覆盖无人机驾驶员所需技能。
           </p>
+        </div>
+
+        {/* Course Facts：意向学员真正会问的几件事 */}
+        <div className="mt-12 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-gray-100 lg:p-9">
+          <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            {courseFacts.map((fact) => {
+              const Icon = fact.icon;
+              return (
+                <div key={fact.label}>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-nbyte-50 text-nbyte-600">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    {fact.label}
+                  </p>
+                  <p className="mt-1.5 text-sm font-bold leading-snug text-nbyte-900">
+                    {fact.value || (
+                      <span className="font-semibold text-nbyte-600">详询招生顾问</span>
+                    )}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Course Cards */}
