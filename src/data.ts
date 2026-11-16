@@ -75,7 +75,7 @@ export const applicationIcons = [
 
 export const baseFeatures = [
   { icon: Plane, label: '真机实操' },
-  { icon: Award, label: '考证通过率高' },
+  { icon: Award, label: '资深教员带飞' },
   { icon: Briefcase, label: '就业推荐' },
 ];
 
