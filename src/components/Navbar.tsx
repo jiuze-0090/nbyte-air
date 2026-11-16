@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Menu, X, Plane } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { navLinks } from '@/data';
+import BrandMark from '@/components/BrandMark';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -28,9 +29,7 @@ export default function Navbar() {
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-8">
         {/* Logo */}
         <button onClick={() => scrollTo('hero')} className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-nbyte-400 to-nbyte-600">
-            <Plane className="h-6 w-6 text-white" />
-          </div>
+          <BrandMark className="h-8 w-8 text-white" />
           <div className="text-left leading-tight">
             <span className="block text-lg font-bold text-white">新字节航空</span>
             <span className="block text-xs font-medium tracking-widest text-nbyte-200">

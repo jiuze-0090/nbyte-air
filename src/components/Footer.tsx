@@ -1,5 +1,6 @@
-import { ArrowUpRight, MapPin, Phone, Plane } from 'lucide-react';
+import { ArrowUpRight, MapPin, Phone } from 'lucide-react';
 
+import BrandMark from '@/components/BrandMark';
 import { ecosystemLinks, navLinks } from '@/data';
 
 /**
@@ -26,9 +27,7 @@ export default function Footer() {
           {/* 品牌 */}
           <div className="lg:col-span-4">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-to-br from-nbyte-400 to-nbyte-600">
-                <Plane className="h-5 w-5 text-white" />
-              </div>
+              <BrandMark className="h-7 w-7 text-white" />
               <span className="text-lg font-bold text-white">新字节航空 Nbyte Air</span>
             </div>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-nbyte-300/70">
