@@ -24,6 +24,7 @@ export const navLinks = [
   { label: '关于我们', id: 'about' },
   { label: '常见问题', id: 'faq' },
   { label: '联系我们', id: 'contact' },
+  { label: '学习资源', id: 'resources' },
 ];
 
 export const heroImage = '/images/hero.webp';
@@ -178,7 +179,7 @@ export const ecosystemLinks: EcosystemLink[] = [
   },
   {
     title: '学员小程序',
-    desc: '2028 道真题 · 12+1 类目 · 错题一键回溯原理',
+    desc: '1956 道真题 · 12+1 类目 · 错题一键回溯原理',
     href: '',
     tag: '微信内打开',
     hint: '微信搜索小程序「UAV-NEWSKY」',

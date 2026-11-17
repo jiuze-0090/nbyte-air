@@ -80,7 +80,7 @@ export default function Footer() {
           </div>
 
           {/* 学习资源区（五端矩阵入口） */}
-          <div className="lg:col-span-4">
+          <div id="resources" className="scroll-mt-24 lg:col-span-4">
             <h3 className="text-sm font-semibold text-white">学习资源</h3>
             <ul className="mt-4 space-y-3">
               {ecosystemLinks.map((item) => {
