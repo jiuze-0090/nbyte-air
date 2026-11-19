@@ -26,6 +26,7 @@ export default function LeadForm() {
   const [errorField, setErrorField] = useState<'name' | 'phone' | null>(null);
   const [summary, setSummary] = useState('');
   const [copied, setCopied] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const buildSummary = () =>
     [
@@ -78,14 +79,16 @@ export default function LeadForm() {
     }
 
     setStatus('submitting');
+    setSubmitError('');
     const text = buildSummary();
     setSummary(text);
     const ok = await copyText(text);
     setCopied(ok);
 
+    let submitted = false;
     if (leadFormConfig.endpoint) {
       try {
-        await fetch(leadFormConfig.endpoint, {
+        const res = await fetch(leadFormConfig.endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -93,10 +96,16 @@ export default function LeadForm() {
             phone: phone.trim(),
             intent,
             message: message.trim(),
+            source: window.location.href,
           }),
         });
+        submitted = res.ok;
+        if (!res.ok) {
+          setSubmitError('提交没成功，可能是网络或接口异常。信息已复制，请直接发给顾问或拨打热线。');
+        }
       } catch {
         // 端点不可用不阻断主流程，摘要已复制，用户仍可发给顾问
+        setSubmitError('网络有点问题，暂时没提交成功。信息已复制，请发给顾问或拨打热线。');
       }
     }
 
@@ -110,14 +119,16 @@ export default function LeadForm() {
           <CheckCircle2 className="mt-0.5 h-8 w-8 shrink-0 text-green-600" />
           <div>
             <h3 className="text-xl font-bold text-nbyte-900">
-              {leadFormConfig.endpoint
-                ? '已收到，顾问今天内联系你'
-                : copied
-                  ? '咨询信息已复制，去加顾问微信发送即可'
-                  : '咨询信息已生成，请手动复制'}
+              {submitError
+                ? '信息已复制，请发给顾问'
+                : leadFormConfig.endpoint
+                  ? '已收到，顾问今天内联系你'
+                  : copied
+                    ? '咨询信息已复制，去加顾问微信发送即可'
+                    : '咨询信息已生成，请手动复制'}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-gray-600">
-              招生顾问在潍坊本地，通常当天回复。若急，也可以直接拨打{' '}
+              {submitError || '招生顾问在潍坊本地，通常当天回复。若急，也可以直接拨打'}{' '}
               <a href="tel:15610090090" className="font-semibold text-nbyte-600">
                 156-1009-0090
               </a>
@@ -152,6 +163,7 @@ export default function LeadForm() {
               setStatus('idle');
               setSummary('');
               setCopied(false);
+              setSubmitError('');
               setName('');
               setPhone('');
               setMessage('');
@@ -269,6 +281,10 @@ export default function LeadForm() {
             : '生成咨询信息'}
         <Send className="h-4 w-4" />
       </button>
+
+      <p className="mt-3 text-xs leading-relaxed text-gray-500">
+        所填信息仅用于课程咨询联系，不对外提供，也不会用于其他用途。
+      </p>
     </form>
   );
 }

@@ -15,7 +15,9 @@ export default function Navbar() {
 
   const scrollTo = (id: string) => {
     setMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    // 尊重系统「减少动态效果」设置
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
   };
 
   return (
@@ -26,9 +28,9 @@ export default function Navbar() {
           : 'bg-transparent'
       }`}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-8">
+      <nav aria-label="主导航" className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-8">
         {/* Logo */}
-        <button onClick={() => scrollTo('hero')} className="flex items-center gap-2.5">
+        <button onClick={() => scrollTo('hero')} aria-label="新字节航空，返回页面顶部" className="flex items-center gap-2.5">
           <BrandMark className="h-8 w-8 text-white" />
           <div className="text-left leading-tight">
             <span className="block text-lg font-bold text-white">新字节航空</span>
@@ -64,7 +66,9 @@ export default function Navbar() {
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="text-white lg:hidden"
-          aria-label="菜单"
+          aria-label={menuOpen ? '关闭菜单' : '打开菜单'}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu"
         >
           {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
@@ -72,7 +76,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="border-t border-white/10 bg-nbyte-950/98 backdrop-blur-md lg:hidden">
+        <div id="mobile-menu" className="border-t border-white/10 bg-nbyte-950/98 backdrop-blur-md lg:hidden">
           <ul className="flex flex-col px-4 py-4">
             {navLinks.map((link) => (
               <li key={link.id}>

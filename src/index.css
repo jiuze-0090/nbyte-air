@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── 无障碍基建（与实验室保持一致）────────────────────────────────────── */
+
+/* 1. 键盘焦点可见：鼠标点击不显示，Tab 聚焦显示清晰焦点环 */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #2838b8;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 2. 尊重系统「减少动态效果」设置：首屏滚动指示器与各处缩放动画一并关闭 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

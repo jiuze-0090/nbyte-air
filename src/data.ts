@@ -198,7 +198,14 @@ export const ecosystemLinks: EcosystemLink[] = [
  * 配置为真实接口地址后，提交会同时 POST JSON：{ name, phone, intent, message }。
  */
 export const leadFormConfig = {
-  endpoint: '',
+  /**
+   * 留资接口地址
+   * ---------------------------------------------------------------------------
+   * 走环境变量，不写死在源码里：换接口不用改代码，只要重新 build。
+   * 留空则降级为「生成咨询摘要 + 一键复制」，表单仍然可用，只是线索要靠用户自己发给顾问。
+   * 生产环境在 `.env.local` 里配 VITE_LEAD_ENDPOINT（见 deploy/scf/lead-handler/README.md）。
+   */
+  endpoint: import.meta.env.VITE_LEAD_ENDPOINT || '',
   intents: [
     '多旋翼视距内执照',
     '多旋翼超视距执照',

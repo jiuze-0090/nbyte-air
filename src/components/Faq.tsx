@@ -55,7 +55,7 @@ export default function Faq() {
                 <span className="text-base font-bold leading-snug text-nbyte-900">
                   {item.q}
                 </span>
-                <ChevronDown className="mt-0.5 h-5 w-5 shrink-0 text-nbyte-400 transition-transform duration-200 group-open:rotate-180" />
+                <ChevronDown className="mt-0.5 h-5 w-5 shrink-0 text-nbyte-400 transition-transform duration-200 group-open:rotate-180" aria-hidden="true" />
               </summary>
               <p className="px-6 pb-6 text-sm leading-relaxed text-gray-600">{item.a}</p>
             </details>
