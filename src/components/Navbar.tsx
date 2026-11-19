@@ -55,7 +55,7 @@ export default function Navbar() {
         {/* CTA Button (Desktop) */}
         <button
           onClick={() => scrollTo('contact')}
-          className="hidden rounded-full bg-accent-orange px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-orange/30 transition-all hover:scale-105 hover:bg-orange-500 lg:block"
+          className="hidden rounded-full bg-accent-orange px-6 py-2.5 text-sm font-semibold text-[#1A1A1A] shadow-lg shadow-accent-orange/30 transition-all hover:scale-105 hover:bg-[#E8551F] lg:block"
         >
           立即咨询
         </button>
@@ -87,7 +87,7 @@ export default function Navbar() {
             <li className="mt-2">
               <button
                 onClick={() => scrollTo('contact')}
-                className="w-full rounded-full bg-accent-orange px-6 py-3 text-sm font-semibold text-white"
+                className="w-full rounded-full bg-accent-orange px-6 py-3 text-sm font-semibold text-[#1A1A1A]"
               >
                 立即咨询
               </button>

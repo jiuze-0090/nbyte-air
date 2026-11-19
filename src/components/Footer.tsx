@@ -106,19 +106,29 @@ export default function Footer() {
                     {item.href ? (
                       <a
                         href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-accent-cyan/40 hover:bg-white/10"
+                        // 外链才开新窗；电话直拨留在当前页，避免手机上跳到空白标签
+                        {...(item.href.startsWith('http')
+                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                          : {})}
+                        className="block rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-accent-cyan/40 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
                       >
                         {inner}
                         <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-accent-cyan">
-                          前往
-                          <ArrowUpRight className="h-3 w-3" />
+                          {item.action || '前往'}
+                          {item.href.startsWith('http') ? (
+                            <ArrowUpRight className="h-3 w-3" />
+                          ) : (
+                            <Phone className="h-3 w-3" />
+                          )}
                         </span>
                       </a>
                     ) : (
-                      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                      // 无链接：明确做成不可点的禁用态，不能和可点卡片长得一样
+                      <div className="rounded-xl border border-dashed border-white/15 bg-white/[0.03] p-4 opacity-80">
                         {inner}
+                        <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-nbyte-400">
+                          {item.action || '暂未开放'}
+                        </span>
                       </div>
                     )}
                   </li>

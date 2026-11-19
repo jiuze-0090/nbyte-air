@@ -27,7 +27,7 @@ export default function Courses() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-nbyte-50 text-nbyte-600">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                  <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-600">
                     {fact.label}
                   </p>
                   <p className="mt-1.5 text-sm font-bold leading-snug text-nbyte-900">

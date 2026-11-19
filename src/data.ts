@@ -168,6 +168,8 @@ export type EcosystemLink = {
   tag: string;
   /** 无链接时展示的提示文案 */
   hint?: string;
+  /** 卡片底部的动作文案（点下去会发生什么） */
+  action?: string;
 };
 
 export const ecosystemLinks: EcosystemLink[] = [
@@ -176,13 +178,16 @@ export const ecosystemLinks: EcosystemLink[] = [
     desc: '10 个交互实验 · 106 条考点索引 · 5 张原理速查卡',
     href: 'https://lab.nbyteair.com/',
     tag: '免费公开',
+    action: '前往实验室',
   },
   {
+    // 备案期：链接直拨热线，小程序上线后只改这一处数据即可切回
     title: '学员小程序',
     desc: '1953 道真题 · 12+1 类目 · 错题一键回溯原理',
-    href: '',
-    tag: '微信内打开',
-    hint: '微信搜索小程序「UAV-NEWSKY」',
+    href: 'tel:15610090090',
+    tag: '即将开放',
+    hint: '小程序备案中，先打电话领自测清单；微信搜索「UAV-NEWSKY」',
+    action: '领取自测清单',
   },
 ];
 

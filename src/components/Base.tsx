@@ -23,7 +23,7 @@ export default function Base() {
                     className="h-56 w-full object-cover sm:h-full sm:min-h-[420px]"
                   />
                 </div>
-                <figcaption className="mt-1.5 text-xs text-gray-400">
+                <figcaption className="mt-1.5 text-xs text-gray-600">
                   {baseImages[0].caption}
                 </figcaption>
               </figure>
@@ -41,7 +41,7 @@ export default function Base() {
                     className="h-40 w-full object-cover sm:h-[200px]"
                   />
                 </div>
-                <figcaption className="mt-1.5 text-xs text-gray-400">
+                <figcaption className="mt-1.5 text-xs text-gray-600">
                   {baseImages[1].caption}
                 </figcaption>
               </figure>
@@ -59,7 +59,7 @@ export default function Base() {
                     className="h-40 w-full object-cover sm:h-[200px]"
                   />
                 </div>
-                <figcaption className="mt-1.5 text-xs text-gray-400">
+                <figcaption className="mt-1.5 text-xs text-gray-600">
                   {baseImages[2].caption}
                 </figcaption>
               </figure>

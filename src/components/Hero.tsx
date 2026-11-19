@@ -45,7 +45,7 @@ export default function Hero() {
           <div className="mt-10 flex flex-col gap-4 sm:flex-row">
             <button
               onClick={() => scrollTo('courses')}
-              className="group inline-flex items-center justify-center gap-2 rounded-full bg-accent-orange px-8 py-3.5 text-base font-semibold text-white shadow-xl shadow-accent-orange/30 transition-all hover:scale-105 hover:bg-orange-500"
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-accent-orange px-8 py-3.5 text-base font-semibold text-[#1A1A1A] shadow-xl shadow-accent-orange/30 transition-all hover:scale-105 hover:bg-[#E8551F]"
             >
               查看课程大纲
               <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />

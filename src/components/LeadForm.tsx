@@ -23,6 +23,7 @@ export default function LeadForm() {
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState('');
+  const [errorField, setErrorField] = useState<'name' | 'phone' | null>(null);
   const [summary, setSummary] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -63,13 +64,16 @@ export default function LeadForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setErrorField(null);
 
     if (!name.trim()) {
       setError('请填写称呼，方便顾问称呼你。');
+      setErrorField('name');
       return;
     }
     if (!PHONE_RE.test(phone.trim())) {
       setError('手机号格式不对，请填 11 位大陆手机号。');
+      setErrorField('phone');
       return;
     }
 
@@ -106,7 +110,11 @@ export default function LeadForm() {
           <CheckCircle2 className="mt-0.5 h-8 w-8 shrink-0 text-green-600" />
           <div>
             <h3 className="text-xl font-bold text-nbyte-900">
-              {copied ? '咨询信息已复制，去加顾问微信发送即可' : '咨询信息已生成，请手动复制'}
+              {leadFormConfig.endpoint
+                ? '已收到，顾问今天内联系你'
+                : copied
+                  ? '咨询信息已复制，去加顾问微信发送即可'
+                  : '咨询信息已生成，请手动复制'}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-gray-600">
               招生顾问在潍坊本地，通常当天回复。若急，也可以直接拨打{' '}
@@ -181,7 +189,10 @@ export default function LeadForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="怎么称呼你"
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-nbyte-400 focus:outline-none focus:ring-2 focus:ring-nbyte-200"
+            autoComplete="name"
+            aria-invalid={errorField === 'name'}
+            aria-describedby={errorField === 'name' ? 'lead-error' : undefined}
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 focus:border-nbyte-400 focus:outline-none focus:ring-2 focus:ring-nbyte-200"
           />
         </div>
 
@@ -196,7 +207,10 @@ export default function LeadForm() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="11 位手机号，方便回电"
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-nbyte-400 focus:outline-none focus:ring-2 focus:ring-nbyte-200"
+            autoComplete="tel"
+            aria-invalid={errorField === 'phone'}
+            aria-describedby={errorField === 'phone' ? 'lead-error' : undefined}
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 focus:border-nbyte-400 focus:outline-none focus:ring-2 focus:ring-nbyte-200"
           />
         </div>
 
@@ -228,13 +242,17 @@ export default function LeadForm() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="比如：在职 / 学生、想考视距内还是超视距、有没有飞行基础"
-            className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-nbyte-400 focus:outline-none focus:ring-2 focus:ring-nbyte-200"
+            className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm leading-relaxed text-gray-900 placeholder:text-gray-500 focus:border-nbyte-400 focus:outline-none focus:ring-2 focus:ring-nbyte-200"
           />
         </div>
       </div>
 
       {error && (
-        <p role="alert" className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <p
+          id="lead-error"
+          role="alert"
+          className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+        >
           {error}
         </p>
       )}
@@ -242,9 +260,13 @@ export default function LeadForm() {
       <button
         type="submit"
         disabled={status === 'submitting'}
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent-orange px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-accent-orange/25 transition-all hover:bg-orange-500 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent-orange px-8 py-3.5 text-base font-semibold text-[#1A1A1A] shadow-lg shadow-accent-orange/25 transition-all hover:bg-[#E8551F] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {status === 'submitting' ? '生成中…' : '生成咨询信息'}
+        {status === 'submitting'
+          ? '提交中…'
+          : leadFormConfig.endpoint
+            ? '提交，顾问联系我'
+            : '生成咨询信息'}
         <Send className="h-4 w-4" />
       </button>
     </form>
