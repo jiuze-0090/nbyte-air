@@ -249,9 +249,6 @@ exports.main = async (event) => {
   }
 
   const ip = clientIp(event);
-  if (!rateLimit(ip)) {
-    return json(429, headers, { ok: false, error: 'too many requests' });
-  }
 
   const body = parseBody(event);
   const name = String(body.name || '').trim().slice(0, NAME_MAX);
@@ -259,8 +256,13 @@ exports.main = async (event) => {
   const intent = String(body.intent || '').trim().slice(0, 60);
   const message = String(body.message || '').trim().slice(0, MESSAGE_MAX);
 
+  // 先校验再限流：用户手滑输错手机号不该被限流，只有「有效提交」才计数
   if (!name) return json(400, headers, { ok: false, error: '缺少称呼' });
   if (!PHONE_RE.test(phone)) return json(400, headers, { ok: false, error: '手机号格式不对' });
+
+  if (!rateLimit(ip)) {
+    return json(429, headers, { ok: false, error: 'too many requests' });
+  }
 
   const lead = {
     name,
