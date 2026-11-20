@@ -49,8 +49,14 @@ Windows 的 `Compress-Archive` **不保留 Unix 可执行权限位**。腾讯云
 
 ```bash
 cd deploy/scf
-python pack.py          # 生成 lead-handler.zip，scf_bootstrap 权限位 755
+python pack.py                # 生成 lead-handler.zip（含 scf_bootstrap，755）
+python pack.py --no-bootstrap  # 生成 lead-handler-console.zip（不含 scf_bootstrap）
 ```
+
+| 包 | 内容 | 用途 |
+|---|---|---|
+| `lead-handler.zip` | 4 个文件，scf_bootstrap=755 | 常规上传 |
+| `lead-handler-console.zip` | 3 个文件，**无 scf_bootstrap** | 让**控制台的启动命令接管**——由腾讯云生成 scf_bootstrap，权限由它保证，绕开 zip 丢执行位的问题 |
 
 | 项 | 说明 |
 |---|---|
@@ -62,9 +68,25 @@ python pack.py          # 生成 lead-handler.zip，scf_bootstrap 权限位 755
 > 「控制台配置仅在上传的代码里未检测到 scf_bootstrap 时生效，
 > 如果您的项目里有 scf_bootstrap 文件，系统会以项目里的 scf_bootstrap 为准进行部署」
 
-所以**不要去改控制台的启动命令**，要改就改包里的 `scf_bootstrap` 内容。
-（兜底：把包里的 scf_bootstrap 删掉，控制台启动命令才会接管，此时填
-`export PORT=9000 && cd /var/user/src && /var/lang/node18/bin/node server.js`）
+- 包**含** scf_bootstrap → 以包里的为准，控制台输入框忽略 → 依赖 zip 的 755 权限位
+- 包**不含** scf_bootstrap → 控制台输入框生效，腾讯云自己生成 scf_bootstrap（权限有保障）✔
+
+**控制台启动命令推荐写法**（兼容代码落在 src/ 或 code/ 的两种布局）：
+
+```bash
+#!/bin/bash
+export PORT=9000
+if [ -f /var/user/src/server.js ]; then cd /var/user/src
+elif [ -f /var/user/code/server.js ]; then cd /var/user/code
+else cd /var/user; fi
+exec /var/lang/node18/bin/node server.js
+```
+
+单行版（如果输入框只接受一行）：
+
+```
+export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif [ -f /var/user/code/server.js ]; then cd /var/user/code; else cd /var/user; fi; exec /var/lang/node18/bin/node server.js
+```
 
 ### 官方对启动脚本的三条硬要求
 
