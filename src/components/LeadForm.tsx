@@ -90,7 +90,11 @@ export default function LeadForm() {
       try {
         const res = await fetch(leadFormConfig.endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          // 用 text/plain 发，避开 CORS 预检：
+          // 带 application/json 会触发 OPTIONS 预检，部分网关对预检的响应不完整，
+          // 浏览器会直接判定跨域失败（fetch 抛异常，POST 根本发不出去）。
+          // 服务端是自己 JSON.parse 请求体的，不看 Content-Type，这里改成 text/plain 一样能解析。
+          headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
           body: JSON.stringify({
             name: name.trim(),
             phone: phone.trim(),
