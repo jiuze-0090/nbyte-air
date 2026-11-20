@@ -41,6 +41,39 @@
 > 用事件函数 + HTTP 触发器也行（`exports.main` 入口，不需要启动命令）；
 > 本包两种形态都能跑：**事件函数走 `index.js`，Web 函数走 `server.js` + `scf_bootstrap`**。
 
+### ⚠️ 打包必须用 `pack.py`，不能用 Compress-Archive
+
+Windows 的 `Compress-Archive` **不保留 Unix 可执行权限位**。腾讯云把 `scf_bootstrap`
+当容器启动命令**直接执行**，没有 +x 就会 `Permission denied` → 函数启动失败 →
+网关只返回 502 → 浏览器判定跨域失败，表单永远提交不上去。
+
+```bash
+cd deploy/scf
+python pack.py          # 生成 lead-handler.zip，scf_bootstrap 权限位 755
+```
+
+| 项 | 说明 |
+|---|---|
+| scf_bootstrap | 权限位 **755**（可执行） |
+| index.js / server.js / package.json | 权限位 644 |
+
+### 官方规则：包里有 scf_bootstrap 时，控制台的「启动命令」不生效
+
+> 「控制台配置仅在上传的代码里未检测到 scf_bootstrap 时生效，
+> 如果您的项目里有 scf_bootstrap 文件，系统会以项目里的 scf_bootstrap 为准进行部署」
+
+所以**不要去改控制台的启动命令**，要改就改包里的 `scf_bootstrap` 内容。
+（兜底：把包里的 scf_bootstrap 删掉，控制台启动命令才会接管，此时填
+`export PORT=9000 && cd /var/user/src && /var/lang/node18/bin/node server.js`）
+
+### 官方对启动脚本的三条硬要求
+
+1. HTTP 触发的函数**必须监听 9000 端口**
+2. 启动命令要用 node **绝对路径** `/var/lang/node18/bin/node`，不能只写 `node`
+3. 文件**必须以 LF 结尾**、且**有 755/777 权限**
+
+### 创建与配置
+
 1. 登录 [腾讯云控制台](https://console.cloud.tencent.com/) → 顶部搜「**云函数 SCF**」→ 进「函数服务」
 2. 顶部选**地域**（建议广州或上海，离学员近）→ 点「**新建**」
 3. 按下面填：
@@ -52,13 +85,8 @@
    | 运行环境 | **Nodejs 18.x** |
    | 时区 | **Asia/Shanghai（北京时间）** |
    | 提交方法 | **通过 zip 上传 zip 包** → 选 `deploy/scf/lead-handler.zip` |
-   | **启动命令** | **`bash scf_bootstrap`** |
+   | 启动命令 | `bash scf_bootstrap`（实际以包里的文件为准） |
    | 资源类型 / 内存 / 超时 | CPU / 256MB / 10 秒 |
-
-   > **启动命令为什么是 `bash scf_bootstrap` 而不是 `./scf_bootstrap`**：
-   > zip 打包不会保留 Unix 可执行权限位，`bash` 调用不依赖那个权限位，省事且稳。
-   >
-   > Web 函数**必须监听 9000 端口**（`scf_bootstrap` 里已经 `export PORT=9000`）。
 
 4. 点「下一步」→ **环境变量**页，点「添加环境变量」，加三条：
 
