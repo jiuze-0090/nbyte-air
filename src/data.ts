@@ -201,11 +201,14 @@ export const leadFormConfig = {
   /**
    * 留资接口地址
    * ---------------------------------------------------------------------------
-   * 走环境变量，不写死在源码里：换接口不用改代码，只要重新 build。
-   * 留空则降级为「生成咨询摘要 + 一键复制」，表单仍然可用，只是线索要靠用户自己发给顾问。
-   * 生产环境在 `.env.local` 里配 VITE_LEAD_ENDPOINT（见 deploy/scf/lead-handler/README.md）。
+   * 优先级：环境变量 VITE_LEAD_ENDPOINT > 下面的默认地址。
+   * 这个 URL 本身是公开的（浏览器要直接调它），写进代码不算泄密；
+   * 真正的密钥是云函数里的企微 webhook，只存在于腾讯云环境变量中。
+   * 换接口时改这里，或在 Cloudflare Pages 环境变量里配 VITE_LEAD_ENDPOINT（推荐，可不改代码）。
    */
-  endpoint: import.meta.env.VITE_LEAD_ENDPOINT || '',
+  endpoint:
+    import.meta.env.VITE_LEAD_ENDPOINT ||
+    'https://1499488717-beu328dfg.ap-shanghai.tencentscf.com',
   intents: [
     '多旋翼视距内执照',
     '多旋翼超视距执照',
