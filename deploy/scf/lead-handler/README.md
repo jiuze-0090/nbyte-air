@@ -7,7 +7,28 @@
                               └──▶ 企业微信群机器人（顾问手机立刻收到）
 ```
 
-代码已打包好：`deploy/scf/lead-handler.zip`（内含 `index.js` + `package.json`，可直接上传）。
+## ✅ 已上线的实例（2026-11-20 实测通过，可直接参照）
+
+| 项 | 值 |
+|---|---|
+| 函数名 | `nbyte-lead-handler-v2` |
+| 地域 / 运行时 / 时区 | 上海 / Nodejs 18.15 / Asia/Shanghai |
+| **公网 HTTPS 地址** | `https://1499488717-cndmzvtany.ap-shanghai.tencentscf.com` |
+| 上传包 | `lead-handler-console.zip`（**不含** `scf_bootstrap`） |
+| 启动命令 | 见下方「控制台启动命令推荐写法」 |
+| 触发器 | 函数 URL：公网访问开启、授权类型「开放」、**CORS 不启用** |
+
+实测结果：
+
+| 检查 | 结果 |
+|---|---|
+| GET 函数 URL | `405 {"ok":false,"error":"method not allowed"}` → 函数活着 |
+| POST | `200 {"ok":true,"saved":false,"notified":true}` → 企微收到 |
+| OPTIONS 预检 | `204`，CORS 头齐全 |
+| 官网表单 UI | 填表提交 → 页面显示「已收到，顾问今天内联系你」 |
+
+> ⚠️ **API 网关已于 2025-06-30 停止服务**（控制台「触发管理」页会红字提示）。
+> 新函数一律用「**函数 URL**」，不要去建 API 网关触发器。
 
 ---
 
@@ -56,12 +77,26 @@ python pack.py --no-bootstrap  # 生成 lead-handler-console.zip（不含 scf_bo
 | 包 | 内容 | 用途 |
 |---|---|---|
 | `lead-handler.zip` | 4 个文件，scf_bootstrap=755 | 常规上传 |
-| `lead-handler-console.zip` | 3 个文件，**无 scf_bootstrap** | 让**控制台的启动命令接管**——由腾讯云生成 scf_bootstrap，权限由它保证，绕开 zip 丢执行位的问题 |
+| **`lead-handler-console.zip`** | 3 个文件，**无 scf_bootstrap** | ✅ **推荐**：让**控制台的启动命令接管**——由腾讯云生成 scf_bootstrap，权限由它保证，绕开 zip 丢执行位的问题。**已验证可用的就是这个包** |
 
 | 项 | 说明 |
 |---|---|
 | scf_bootstrap | 权限位 **755**（可执行） |
 | index.js / server.js / package.json | 权限位 644 |
+
+### 🔴 502 根因（踩过，务必避开）
+
+腾讯云会把上传的代码放进 `src/` 子目录。如果 `scf_bootstrap` 里写的是相对路径
+`exec node server.js`，在 `src/` 里就找不到该文件 → **启动失败 → 网关只返回 502**
+→ 502 响应里没有 CORS 头 → 浏览器判定跨域失败 → **POST 根本发不出去**
+→ 官网表单表现为「网络有点问题，暂时没提交成功」。
+
+**四种修法，按可靠性排序：**
+
+1. ✅ **上传 `lead-handler-console.zip`（不含 scf_bootstrap）**，让控制台启动命令接管（**已验证**）
+2. 用 `pack.py` 打包（写 755 权限位）+ 启动脚本自定位（兼容 `src/` 与根目录）
+3. 控制台在线编辑 `src/scf_bootstrap` 的内容（在线保存时腾讯云会重新打包并处理权限）
+4. 别删 `src/scf_bootstrap` —— 删掉后控制台会直接报部署失败
 
 ### 官方规则：包里有 scf_bootstrap 时，控制台的「启动命令」不生效
 
@@ -94,6 +129,12 @@ export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif
 2. 启动命令要用 node **绝对路径** `/var/lang/node18/bin/node`，不能只写 `node`
 3. 文件**必须以 LF 结尾**、且**有 755/777 权限**
 
+### ⚠️ 不要在 package.json 里声明依赖
+
+声明了依赖，云端启动阶段可能执行 `npm install`，装不上或网络不通就一直卡着 →
+容器起不来 → 502。本包**已移除 `@cloudbase/node-sdk`**，启动零外部依赖。
+数据库是可选功能，代码里已优雅降级（找不到模块就跳过落库，只发企微通知）。
+
 ### 创建与配置
 
 1. 登录 [腾讯云控制台](https://console.cloud.tencent.com/) → 顶部搜「**云函数 SCF**」→ 进「函数服务」
@@ -106,30 +147,32 @@ export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif
    | 地域 | 广州 / 上海 |
    | 运行环境 | **Nodejs 18.x** |
    | 时区 | **Asia/Shanghai（北京时间）** |
-   | 提交方法 | **通过 zip 上传 zip 包** → 选 `deploy/scf/lead-handler.zip` |
-   | 启动命令 | `bash scf_bootstrap`（实际以包里的文件为准） |
+   | 提交方法 | **通过 zip 上传 zip 包** → 选 `deploy/scf/lead-handler-console.zip` |
+   | 启动命令 | 见上方推荐写法（包内无 scf_bootstrap，这栏生效） |
    | 资源类型 / 内存 / 超时 | CPU / 256MB / 10 秒 |
 
-4. 点「下一步」→ **环境变量**页，点「添加环境变量」，加三条：
+4. 点「下一步」→ **环境变量**页，点「添加环境变量」，加三条（**不要加空的**）：
 
    | 变量名 | 值 |
    |---|---|
    | `CORS_ORIGINS` | `https://www.nbyteair.com`（实验室也要用就补 `,https://lab.nbyteair.com`） |
    | `WECOM_WEBHOOK` | 第一步复制的 Webhook 地址 |
-   | `WECOM_SECRET` | 可选。机器人的「安全密钥」；填了就自动带签名 |
    | `LEAD_COLLECTION` | `leads`（可改，不建数据库就无所谓） |
 
    > 环境变量的 key/value 只能含字母数字下划线，长度 2–64 字节，不能有中文和特殊符号。
+   > 控制台默认自带一条 `TZ=Asia/Shanghai`（对应时区设置），**那一条别动**。
+   > `WECOM_SECRET` 只在机器人配了「安全密钥」时才需要；没配就别加这行
+   > （控制台的 value **不能留空**，留空就整行删掉）。
    >
-   > **关于依赖**：`package.json` 里声明了 `@cloudbase/node-sdk`（写数据库用）。
-   > 云端如果没装上这个依赖，函数会**自动跳过落库**，只发企微通知——**不影响收线索**。
-   > 所以「不建 CloudBase 也能用」是设计好的，不是坑。
+   > **关于依赖**：本包已不含任何 npm 依赖。云端若没有数据库 SDK，函数会**自动跳过落库**，
+   > 只发企微通知——**不影响收线索**。所以「不建 CloudBase 也能用」是设计好的，不是坑。
 
 5. 点「完成」创建。
 
 ## 三、创建「函数 URL」（这一步容易踩坑）
 
-腾讯云现在主推 **函数 URL**，不是老的 API 网关。
+腾讯云现在主推 **函数 URL**，不是老的 API 网关（**API 网关已于 2025-06-30 停止服务**，
+控制台「触发管理」页会红字提示，别去建 API 网关触发器）。
 
 1. 进刚建好的函数 → 左侧导航「**函数 URL**」→「新建函数 URL」
 2. 按下面填：
@@ -146,7 +189,8 @@ export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif
    > `CORS_ORIGINS` 环境变量统一管，控制台这项留空。
 
 3. 确定后，会生成一个访问地址，形如：
-   `https://xxxxxxxx-xxxx.ap-shanghai.scf.tencent.com/api/xxxxxxxx`
+   `https://1499488717-cndmzvtany.ap-shanghai.tencentscf.com`
+   （Web 函数是**无路径**的根地址，不像 API 网关那样带 `/api/xxx`）
    **把这个地址复制下来**（第 5 步要用）。
 
 4. 验证一下（在浏览器地址栏打开会返回 JSON 错误提示属正常）：
@@ -213,12 +257,23 @@ endpoint: import.meta.env.VITE_LEAD_ENDPOINT || 'https://你的函数URL',
 
 | 现象 | 原因 |
 |---|---|
+| **表单一直显示「网络有点问题，暂时没提交成功」** | **502**：函数没起来。① 包里的 `scf_bootstrap` 用相对路径找不到 `server.js`（代码在 `src/` 下）② zip 丢了 755 执行位 ③ `npm install` 卡死 ④ 端口不是 9000。→ 改用 `lead-handler-console.zip` + 控制台启动命令 |
 | 浏览器控制台报 CORS 错误 | ① `CORS_ORIGINS` 没写全（要 `https://` + 域名，无路径无尾斜杠）② 控制台的 CORS 又开了，导致头重复 —— 关掉控制台那个 |
 | 报 403 / 401 | 函数 URL 授权类型选了 CAM 鉴权，改成「开放」 |
 | 提示「已收到」但企微没消息 | `WECOM_WEBHOOK` 配错，或机器人被移出群；去群里确认机器人还在 |
 | 提示「已收到」但数据库没记录 | 正常——数据库没配，函数跳过落库只发通知 |
 | 提交后一直转圈 | 函数没开公网访问，或超时太短 |
-| 线上表单还是「生成咨询信息」 | Cloudflare 环境变量没配，或改完没点 Retry deployment |
+| 线上表单还是「生成咨询信息」 | Cloudflare 环境变量没配，或改完没点 Retry deployment；也可能是 `data.ts` 里的兜底地址没更新 |
+
+### 快速自检（不改代码，改完先跑这个）
+
+```bash
+cd deploy/scf/lead-handler
+node test-local.js
+```
+
+覆盖：正常 200 / 缺称呼 400 / 手机号非法 400 / OPTIONS 204 / 越权 Origin 403 / 限流 /
+校验失败不计入限流。企微推送也会真的发一条。
 
 ## 八、字段与隐私
 
