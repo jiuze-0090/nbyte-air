@@ -35,7 +35,11 @@
 > 如果机器人配置页里有「**安全密钥**」，把它也填进函数环境变量 `WECOM_SECRET`——
 > 函数会自动按官方算法带 timestamp + sign 签名。不填也能用，只是没开安全校验。
 
-## 二、建云函数
+## 二、建云函数（Web 函数形态）
+
+> 腾讯云现在主推 **Web 函数**（要填「启动命令」）。若控制台还能选「事件函数」，
+> 用事件函数 + HTTP 触发器也行（`exports.main` 入口，不需要启动命令）；
+> 本包两种形态都能跑：**事件函数走 `index.js`，Web 函数走 `server.js` + `scf_bootstrap`**。
 
 1. 登录 [腾讯云控制台](https://console.cloud.tencent.com/) → 顶部搜「**云函数 SCF**」→ 进「函数服务」
 2. 顶部选**地域**（建议广州或上海，离学员近）→ 点「**新建**」
@@ -43,14 +47,18 @@
 
    | 项 | 填什么 |
    |---|---|
-   | 函数类型 | **HTTP 型**（不是事件型） |
    | 函数名称 | `nbyte-lead-handler` |
    | 地域 | 广州 / 上海 |
-   | 运行时 | **Nodejs 18.x** |
-   | 实例 | 按需（默认就行） |
-   | 上传方式 | **zip 文件上传** → 选 `deploy/scf/lead-handler.zip` |
-   | 执行内存 | 256 MB |
-   | 超时 | 10 秒 |
+   | 运行环境 | **Nodejs 18.x** |
+   | 时区 | **Asia/Shanghai（北京时间）** |
+   | 提交方法 | **通过 zip 上传 zip 包** → 选 `deploy/scf/lead-handler.zip` |
+   | **启动命令** | **`bash scf_bootstrap`** |
+   | 资源类型 / 内存 / 超时 | CPU / 256MB / 10 秒 |
+
+   > **启动命令为什么是 `bash scf_bootstrap` 而不是 `./scf_bootstrap`**：
+   > zip 打包不会保留 Unix 可执行权限位，`bash` 调用不依赖那个权限位，省事且稳。
+   >
+   > Web 函数**必须监听 9000 端口**（`scf_bootstrap` 里已经 `export PORT=9000`）。
 
 4. 点「下一步」→ **环境变量**页，点「添加环境变量」，加三条：
 

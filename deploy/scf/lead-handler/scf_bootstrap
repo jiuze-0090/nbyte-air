@@ -1,0 +1,5 @@
+#!/bin/bash
+# 腾讯云 Web 函数启动脚本
+# HTTP 触发的函数必须监听 9000 端口
+export PORT=9000
+exec node server.js
