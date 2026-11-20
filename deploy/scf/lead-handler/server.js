@@ -31,6 +31,11 @@ const server = http.createServer(async (req, res) => {
     path: req.url,
   };
 
+  // 排查用：记录每次请求的来源与长度，一眼看出「请求到底有没有到云端」
+  console.log(
+    `[lead] 收到请求 ${req.method} ${req.url} origin=${headers.origin || '无'} 长度=${raw.length}`,
+  );
+
   try {
     const out = await main(event);
     const h = out.headers || {};
