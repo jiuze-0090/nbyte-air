@@ -1,5 +1,23 @@
 #!/bin/bash
 # 腾讯云 Web 函数启动脚本
-# HTTP 触发的函数必须监听 9000 端口
+# ---------------------------------------------------------------------------
+# HTTP 触发的函数必须监听 9000 端口。
+# 腾讯云在线编辑 / zip 上传后，代码可能落在 src/ 下，也可能落在包根目录，
+# 所以这里用脚本自身所在目录定位，两种布局都兼容——
+# 否则 node 找不到 server.js，函数启动失败，网关只会返回 502，浏览器则报跨域失败。
 export PORT=9000
-exec node server.js
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)"
+[ -z "$DIR" ] && DIR="."
+cd "$DIR" || exit 1
+
+if [ -f "server.js" ]; then
+  exec node server.js
+elif [ -f "src/server.js" ]; then
+  exec node src/server.js
+else
+  # 出错信息用 ASCII，避免云端 locale 下的编码乱码
+  echo "[lead] server.js not found, dir=$DIR"
+  ls -la
+  exit 1
+fi
