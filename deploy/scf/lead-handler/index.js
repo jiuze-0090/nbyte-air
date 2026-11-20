@@ -33,6 +33,7 @@ const ALLOWED_ORIGINS = (process.env.CORS_ORIGINS || 'https://www.nbyteair.com')
   .filter(Boolean);
 
 const WECOM_WEBHOOK = process.env.WECOM_WEBHOOK || '';
+const WECOM_SECRET = process.env.WECOM_SECRET || ''; // 可选：机器人的安全密钥
 const COLLECTION = process.env.LEAD_COLLECTION || 'leads';
 
 /** 手机号脱敏 */
@@ -116,43 +117,113 @@ async function saveToDatabase(lead) {
   }
 }
 
-/** 推企业微信群机器人 */
+/**
+ * 推企业微信群机器人（消息推送）
+ * ---------------------------------------------------------------------------
+ * 兼容两种 webhook：
+ *   ① 经典群机器人：https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx
+ *      消息体 { msgtype: 'markdown', markdown: { content } }
+ *   ② 智能机器人 API 模式的消息推送地址（格式可能不同）
+ *      → 先按 ① 发，若返回 errcode 非 0，自动降级用纯 text 格式再试一次
+ * 配了安全密钥（WECOM_SECRET）时按官方签名算法带 timestamp + sign。
+ */
 function pushWecom(lead) {
   if (!WECOM_WEBHOOK) return Promise.resolve(false);
-  const body = {
-    msgtype: 'markdown',
-    markdown: {
-      content: [
-        '**新线索 · 官网课程咨询**',
-        `> 称呼：${lead.name}`,
-        `> 手机：${lead.phoneMasked}`,
-        `> 意向：${lead.intent}`,
-        lead.message ? `> 留言：${lead.message}` : '',
-        `> 来源：${lead.source}`,
-        `> 时间：${lead.time}`,
-      ]
-        .filter(Boolean)
-        .join('\n'),
-    },
+
+  const content = [
+    '**新线索 · 官网课程咨询**',
+    `> 称呼：${lead.name}`,
+    `> 手机：${lead.phoneMasked}`,
+    `> 意向：${lead.intent}`,
+    lead.message ? `> 留言：${lead.message}` : '',
+    `> 来源：${lead.source}`,
+    `> 时间：${lead.time}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  // markdown 优先，失败再退到 text
+  const payloads = [
+    { msgtype: 'markdown', markdown: { content } },
+    { msgtype: 'text', text: { content: content.replace(/\*\*/g, '').replace(/^>\s?/gm, '') } },
+  ];
+
+  let attempt = 0;
+
+  const send = () => {
+    if (attempt >= payloads.length) return Promise.resolve(false);
+    const payload = JSON.stringify(payloads[attempt]);
+    attempt += 1;
+
+    return postJson(WECOM_WEBHOOK, payload).then((res) => {
+      if (res.ok && (!res.body || res.body.errcode === 0 || res.body.errcode === undefined)) {
+        return true;
+      }
+      console.error(
+        '[lead] 企微推送失败：',
+        JSON.stringify({ status: res.status, body: res.body }).slice(0, 300),
+      );
+      // 还有别的格式就再试一次
+      return send();
+    });
   };
-  const payload = JSON.stringify(body);
+
+  return send();
+}
+
+/** POST JSON 到 https 地址，返回 { ok, status, body } */
+function postJson(urlString, payload) {
   return new Promise((resolve) => {
-    const url = new URL(WECOM_WEBHOOK);
+    let url;
+    try {
+      url = new URL(urlString);
+    } catch (e) {
+      resolve({ ok: false, status: 0, body: { errmsg: 'webhook 地址格式不对' } });
+      return;
+    }
+
+    // 带安全密钥时按官方算法加签名
+    const headers = {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(payload),
+    };
+    if (WECOM_SECRET) {
+      const timestamp = Math.floor(Date.now() / 1000);
+      const sign = crypto
+        .createHmac('sha1', WECOM_SECRET)
+        .update(`${timestamp}\n${WECOM_SECRET}`)
+        .digest('base64');
+      url.searchParams.set('timestamp', String(timestamp));
+      url.searchParams.set('sign', sign);
+    }
+
     const req = https.request(
       {
         hostname: url.hostname,
         path: url.pathname + url.search,
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+        headers,
       },
       (res) => {
-        res.resume();
-        res.on('end', () => resolve(res.statusCode === 200));
+        let raw = '';
+        res.setEncoding('utf8');
+        res.on('data', (c) => {
+          raw += c;
+        });
+        res.on('end', () => {
+          let body;
+          try {
+            body = JSON.parse(raw);
+          } catch (e) {
+            body = { raw: raw.slice(0, 200) };
+          }
+          resolve({ ok: res.statusCode >= 200 && res.statusCode < 300, status: res.statusCode, body });
+        });
       },
     );
     req.on('error', (e) => {
-      console.error('[lead] 企微通知失败：', e && e.message);
-      resolve(false);
+      console.error('[lead] 企微请求异常：', e && e.message);
+      resolve({ ok: false, status: 0, body: { errmsg: String(e && e.message) } });
     });
     req.write(payload);
     req.end();
