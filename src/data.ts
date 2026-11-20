@@ -208,7 +208,7 @@ export const leadFormConfig = {
    */
   endpoint:
     import.meta.env.VITE_LEAD_ENDPOINT ||
-    'https://1499488717-beu328dfg.ap-shanghai.tencentscf.com',
+    'https://1499488717-cndmzvtany.ap-shanghai.tencentscf.com',
   intents: [
     '多旋翼视距内执照',
     '多旋翼超视距执照',
