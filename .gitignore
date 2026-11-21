@@ -24,3 +24,6 @@ dist-ssr
 
 # 云函数打包产物（每次构建重新生成，不入库）
 deploy/scf/*.zip
+
+# vite 构建期临时文件
+vite.config.ts.timestamp-*.mjs

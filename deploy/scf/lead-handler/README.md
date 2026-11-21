@@ -158,6 +158,7 @@ export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif
    | `CORS_ORIGINS` | `https://www.nbyteair.com`（实验室也要用就补 `,https://lab.nbyteair.com`） |
    | `WECOM_WEBHOOK` | 第一步复制的 Webhook 地址 |
    | `LEAD_COLLECTION` | `leads`（可改，不建数据库就无所谓） |
+   | `REQUIRE_CONSENT` | 可选。默认 `true`（未取得告知同意一律拒收）；紧急回滚时才设 `false` |
 
    > 环境变量的 key/value 只能含字母数字下划线，长度 2–64 字节，不能有中文和特殊符号。
    > 控制台默认自带一条 `TZ=Asia/Shanghai`（对应时区设置），**那一条别动**。
@@ -214,6 +215,23 @@ export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif
 
 ## 五、接到官网上（**两处都要配**）
 
+### ⚠️ 部署顺序（合规改造后必须遵守）
+
+云函数现在**要求提交带 `consent: true`**（未勾选《学员咨询信息处理告知书》的提交一律拒收）。
+
+```
+1️⃣ 先部署官网前端（带勾选框 + privacy.html）  ← 必须先
+2️⃣ 确认线上 www.nbyteair.com 的表单里已经有勾选框
+3️⃣ 再上传新的 lead-handler-console.zip 并部署云函数
+```
+
+顺序反了会怎样：旧官网（无勾选框）提交 → 没有 consent 字段 → 云函数返回 400
+`consent required` → 用户看到"提交没成功"。**不会丢线索**（用户还能打电话），
+但会有一段时间的报错。
+
+**紧急回滚**：在函数环境变量加 `REQUIRE_CONSENT` = `false` 并部署，
+即可临时恢复"无同意也接收"，回滚后再去掉这条变量。
+
 ### 5.1 Cloudflare Pages（生产环境，必须配）
 
 `.env.local` 被 gitignore 了（`.gitignore` 里有 `.env` 和 `*.local`），
@@ -258,6 +276,8 @@ endpoint: import.meta.env.VITE_LEAD_ENDPOINT || 'https://你的函数URL',
 | 现象 | 原因 |
 |---|---|
 | **表单一直显示「网络有点问题，暂时没提交成功」** | **502**：函数没起来。① 包里的 `scf_bootstrap` 用相对路径找不到 `server.js`（代码在 `src/` 下）② zip 丢了 755 执行位 ③ `npm install` 卡死 ④ 端口不是 9000。→ 改用 `lead-handler-console.zip` + 控制台启动命令 |
+| **提交返回 `consent required`（400）** | 官网前端还没部署带勾选框的版本，或用户没勾选。→ 先部署官网前端；紧急回滚加环境变量 `REQUIRE_CONSENT=false` |
+| **提交返回 `invalid request`（400）** | 蜜罐字段 `hp` 非空，被判定为脚本提交并丢弃。真人不该碰到这个——先查前端有没有误把蜜罐渲染成可见输入框 |
 | 浏览器控制台报 CORS 错误 | ① `CORS_ORIGINS` 没写全（要 `https://` + 域名，无路径无尾斜杠）② 控制台的 CORS 又开了，导致头重复 —— 关掉控制台那个 |
 | 报 403 / 401 | 函数 URL 授权类型选了 CAM 鉴权，改成「开放」 |
 | 提示「已收到」但企微没消息 | `WECOM_WEBHOOK` 配错，或机器人被移出群；去群里确认机器人还在 |

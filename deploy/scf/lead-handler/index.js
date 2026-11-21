@@ -11,6 +11,12 @@
  *   CORS_ORIGINS   允许访问的站点，逗号分隔。默认只放官网
  *   WECOM_WEBHOOK  企业微信群机器人 Webhook 地址（企微群 → 群机器人 → 复制地址）
  *   LEAD_COLLECTION CloudBase 集合名，默认 leads
+ *   REQUIRE_CONSENT 默认 true：未取得「告知同意」的提交一律拒收。
+ *                   紧急回滚时可设 'false' 临时放宽。
+ *
+ * 请求体：{ name, phone, intent, message, source, consent, hp }
+ *   consent  前端勾选《学员咨询信息处理告知书》后传 true
+ *   hp       蜜罐字段，真人不可见；非空即判定为脚本提交并丢弃
  *
  * 隐私：日志与企微通知里手机号脱敏（138****0090），完整号码只进数据库。
  */
@@ -35,6 +41,9 @@ const ALLOWED_ORIGINS = (process.env.CORS_ORIGINS || 'https://www.nbyteair.com')
 const WECOM_WEBHOOK = process.env.WECOM_WEBHOOK || '';
 const WECOM_SECRET = process.env.WECOM_SECRET || ''; // 可选：机器人的安全密钥
 const COLLECTION = process.env.LEAD_COLLECTION || 'leads';
+// 未取得「告知同意」的提交一律拒收（《个人信息保护法》第十三条）。
+// 紧急回滚可设成 'false' 临时放宽，但那只应作为应急手段。
+const REQUIRE_CONSENT = process.env.REQUIRE_CONSENT !== 'false';
 
 /** 手机号脱敏 */
 function maskPhone(phone) {
@@ -138,6 +147,7 @@ function pushWecom(lead) {
     lead.message ? `> 留言：${lead.message}` : '',
     `> 来源：${lead.source}`,
     `> 时间：${lead.time}`,
+    lead.consent ? '> 告知同意：已勾选' : '> 告知同意：未勾选（兼容模式）',
   ]
     .filter(Boolean)
     .join('\n');
@@ -255,6 +265,21 @@ exports.main = async (event) => {
   const phone = String(body.phone || '').trim();
   const intent = String(body.intent || '').trim().slice(0, 60);
   const message = String(body.message || '').trim().slice(0, MESSAGE_MAX);
+  const hp = String(body.hp || '').trim().slice(0, 100);
+  const consent = body.consent === true || body.consent === 'true' || body.consent === '1';
+
+  // 蜜罐：真人看不到、也填不到这个字段；脚本批量提交会填，直接拒收
+  if (hp) {
+    console.warn('[lead] 蜜罐命中，丢弃', { ip, name: name.slice(0, 12) });
+    return json(400, headers, { ok: false, error: 'invalid request' });
+  }
+
+  // 告知同意：没有单独同意不收集手机号（《个人信息保护法》第十三条）
+  // REQUIRE_CONSENT 设成 'false' 可临时放宽，仅用于紧急回滚
+  if (REQUIRE_CONSENT && !consent) {
+    console.warn('[lead] 未取得同意，拒收', { ip });
+    return json(400, headers, { ok: false, error: 'consent required' });
+  }
 
   // 先校验再限流：用户手滑输错手机号不该被限流，只有「有效提交」才计数
   if (!name) return json(400, headers, { ok: false, error: '缺少称呼' });
@@ -271,6 +296,7 @@ exports.main = async (event) => {
     intent: intent || '未填',
     message,
     source: String(body.source || '').slice(0, 200),
+    consent,
     ip,
     time: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
   };

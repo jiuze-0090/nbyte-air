@@ -9,7 +9,11 @@ import { leadFormConfig } from '@/data';
  * 默认不依赖任何后端：提交后生成一段结构化咨询信息并复制到剪贴板，
  * 用户加顾问微信直接粘贴发送即可。
  * 若在 leadFormConfig.endpoint 填入真实接口地址，提交会额外 POST 一份 JSON：
- * { name, phone, intent, message }
+ * { name, phone, intent, message, consent, hp }
+ *
+ * 合规：手机号属个人信息，收集前必须取得单独同意（《个人信息保护法》第十三条、
+ * 第十七条）。所以「同意告知书」勾选框默认不勾选，未勾选不提交。
+ * 蜜罐字段 hp 对真人不可见、不填写；机器人批量提交会填上它，服务端据此拒收。
  */
 
 type Status = 'idle' | 'submitting' | 'done';
@@ -21,9 +25,11 @@ export default function LeadForm() {
   const [phone, setPhone] = useState('');
   const [intent, setIntent] = useState(leadFormConfig.intents[0]);
   const [message, setMessage] = useState('');
+  const [consent, setConsent] = useState(false);
+  const [hp, setHp] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState('');
-  const [errorField, setErrorField] = useState<'name' | 'phone' | null>(null);
+  const [errorField, setErrorField] = useState<'name' | 'phone' | 'consent' | null>(null);
   const [summary, setSummary] = useState('');
   const [copied, setCopied] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -77,6 +83,11 @@ export default function LeadForm() {
       setErrorField('phone');
       return;
     }
+    if (!consent) {
+      setError('请先阅读并勾选《学员咨询信息处理告知书》，我们才能收集你的联系方式。');
+      setErrorField('consent');
+      return;
+    }
 
     setStatus('submitting');
     setSubmitError('');
@@ -101,6 +112,10 @@ export default function LeadForm() {
             intent,
             message: message.trim(),
             source: window.location.href,
+            // 合规：明确记录用户已勾选同意
+            consent: true,
+            // 蜜罐：真人看不到也填不了，机器人会填
+            hp,
           }),
         });
         submitted = res.ok;
@@ -171,6 +186,8 @@ export default function LeadForm() {
               setName('');
               setPhone('');
               setMessage('');
+              setConsent(false);
+              setHp('');
             }}
             className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-6 py-2.5 text-sm font-semibold text-gray-700 transition-all hover:border-nbyte-400 hover:text-nbyte-700"
           >
@@ -273,6 +290,62 @@ export default function LeadForm() {
         </p>
       )}
 
+      {/* 蜜罐：真人看不到（移出视口）也填不了，脚本批量提交会填它 */}
+      <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', top: 'auto' }}>
+        <label htmlFor="lead-hp">请勿填写</label>
+        <input
+          id="lead-hp"
+          type="text"
+          name="company_website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={hp}
+          onChange={(e) => setHp(e.target.value)}
+        />
+      </div>
+
+      {/* 个人信息处理单独同意（《个人信息保护法》第十三条） */}
+      <div className="mt-5">
+        <label
+          htmlFor="lead-consent"
+          className="flex cursor-pointer items-start gap-2.5 text-sm leading-relaxed text-gray-700"
+        >
+          <input
+            id="lead-consent"
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => {
+              setConsent(e.target.checked);
+              if (e.target.checked && errorField === 'consent') {
+                setError('');
+                setErrorField(null);
+              }
+            }}
+            aria-required="true"
+            aria-invalid={errorField === 'consent'}
+            aria-describedby="lead-consent-note"
+            className="mt-1 h-4 w-4 shrink-0 accent-[#FF6B35]"
+          />
+          <span>
+            我已阅读并同意
+            <a
+              href="/privacy.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-nbyte-600 underline underline-offset-2 hover:text-nbyte-700"
+            >
+              《学员咨询信息处理告知书》
+            </a>
+            ，同意山东新字节航空科技有限公司为回复我的咨询并安排课程，处理我的称呼、手机号、
+            意向班型与咨询内容。
+          </span>
+        </label>
+        <p id="lead-consent-note" className="mt-1.5 pl-7 text-xs leading-relaxed text-gray-500">
+          手机号仅用于招生联系，不会用于其他用途，也不会提供给无关第三方。咨询信息默认保存 6 个月，
+          你可随时电话撤回同意。
+        </p>
+      </div>
+
       <button
         type="submit"
         disabled={status === 'submitting'}
@@ -287,7 +360,16 @@ export default function LeadForm() {
       </button>
 
       <p className="mt-3 text-xs leading-relaxed text-gray-500">
-        所填信息仅用于课程咨询联系，不对外提供，也不会用于其他用途。
+        提交即表示你已阅读并同意
+        <a
+          href="/privacy.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-nbyte-600 underline underline-offset-2 hover:text-nbyte-700"
+        >
+          《学员咨询信息处理告知书》
+        </a>
+        。
       </p>
     </form>
   );
