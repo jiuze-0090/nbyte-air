@@ -16,7 +16,7 @@ export default function About() {
             <p className="mt-6 text-base leading-relaxed text-gray-600">
               新字节航空致力于无人机人才培养与技术服务。我们不仅提供专业的
               CAAC 无人机执照考前培训，还具备专业的无人机设备组装与出口能力，
-              是行业内的技术先行者。
+              课程教学与设备交付由同一支团队完成，出了问题找得到人。
             </p>
 
             {/* Highlights */}
@@ -60,11 +60,11 @@ export default function About() {
             {/* Floating stat card */}
             <div className="relative -mt-12 ml-6 rounded-xl bg-white p-5 shadow-xl ring-1 ring-gray-100 sm:ml-12">
               <div className="flex items-center gap-4">
-                <div className="text-3xl font-bold text-nbyte-600">100%</div>
+                <div className="text-3xl font-bold text-nbyte-600">全等级</div>
                 <div className="text-sm text-gray-600">
-                  覆盖 CAAC 视距内 超视距
+                  覆盖 CAAC 视距内 · 超视距
                   <br />
-                  教员 全等级培训认证
+                  教员持证带飞
                 </div>
               </div>
             </div>

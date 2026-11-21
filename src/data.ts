@@ -83,7 +83,7 @@ export const baseFeatures = [
 export const aboutHighlights = [
   { icon: ShieldCheck, title: 'CAAC 执照考前培训', desc: '按民航局考纲组织教学，覆盖多旋翼全等级' },
   { icon: Cog, title: '设备组装与出口', desc: '专业组装能力，面向国内外市场' },
-  { icon: Award, title: '技术先行者', desc: '深耕低空经济领域，行业经验丰富' },
+  { icon: Award, title: '本地自有团队', desc: '教研与教员常驻潍坊，课程与设备问题当场解决' },
 ];
 
 /**
@@ -135,7 +135,7 @@ export const faqItems: { q: string; a: string }[] = [
   },
   {
     q: '实操是怎么上的？',
-    a: '潍坊奎文实训基地配备多种型号真机设备，标准化实飞场地，小班制教学，教员一对一全程带飞指导，确保每位学员都能获得充分的实操训练时间。',
+    a: '潍坊奎文实训基地配备多种型号真机设备，标准化实飞场地，小班制教学，教员一对一全程带飞指导，让每位学员都有足够的真机操作时间。',
   },
   {
     q: '理论要学多久？总共多少天？',
