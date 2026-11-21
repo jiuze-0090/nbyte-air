@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  官网是单页 SPA，只有一个可独立收录的 URL。
+  原先这里还列了 #courses / #base / #about / #contact 四个锚点——fragment 不会产生独立页面，
+  百度与 Google 都不索引锚点，提交上去等于噪音，已移除。
+  实验室（lab.nbyteair.com）是另一个站点，sitemap 独立，见 https://lab.nbyteair.com/sitemap.xml
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.nbyteair.com/</loc>
+    <lastmod>2026-11-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://www.nbyteair.com/#courses</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.nbyteair.com/#base</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.nbyteair.com/#about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.nbyteair.com/#contact</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
   </url>
 </urlset>
