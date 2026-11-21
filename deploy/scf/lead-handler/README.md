@@ -106,10 +106,29 @@ Windows 的 `Compress-Archive` **不保留 Unix 可执行权限位**。腾讯云
 
 **四种修法，按可靠性排序：**
 
-1. ✅ **上传 `lead-handler-console.zip`（不含 scf_bootstrap）**，让控制台启动命令接管（**已验证**）
-2. 用 `pack.py` 打包（写 755 权限位）+ 启动脚本自定位（兼容 `src/` 与根目录）
+1. ✅ **上传 `lead-handler.zip`（4 文件，含 scf_bootstrap，755 权限位）**
+   —— 脚本已自定位目录（兼容 `src/` 与 `code/` 两种布局），node 用绝对路径
+2. ✅ **上传 `lead-handler-console.zip`（3 文件，不含 scf_bootstrap）**，让控制台启动命令接管
+   —— ⚠️ **仅在「新建函数」时可用**。更新已有函数会失败，见下。
 3. 控制台在线编辑 `src/scf_bootstrap` 的内容（在线保存时腾讯云会重新打包并处理权限）
 4. 别删 `src/scf_bootstrap` —— 删掉后控制台会直接报部署失败
+
+### 🔴 更新已有函数时，zip 必须含 scf_bootstrap（2026-11-21 踩过）
+
+用 3 文件的 `lead-handler-console.zip` 去**更新**已建好的 Web 函数，部署直接失败：
+
+```
+baseCodeCosInfo Failed, resp: null: ResourceNotFound EntityError.Err&
+(ResourceNotFound Entrypile Unzip entryfile Failed,
+Err exit status 11 OUT caution: filename not matched: scf_bootstrap )
+```
+
+`Entrypile Unzip entryfile` —— 解包后要拿 `scf_bootstrap` 当入口文件，找不到就判定失败。
+
+**结论**：
+- **新建**函数 → 3 文件包可以（控制台启动命令接管，权限由腾讯云保证）
+- **更新**已有函数 → **必须传 4 文件的 `lead-handler.zip`**（含 scf_bootstrap + 755 权限位）
+- 两个包都保留，别删：`lead-handler.zip` 用于更新，`lead-handler-console.zip` 用于新建
 
 ### 官方规则：包里有 scf_bootstrap 时，控制台的「启动命令」不生效
 
