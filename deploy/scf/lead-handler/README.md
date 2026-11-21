@@ -14,7 +14,7 @@
 | 函数名 | `nbyte-lead-handler-v2` |
 | 地域 / 运行时 / 时区 | 上海 / Nodejs 18.15 / Asia/Shanghai |
 | **公网 HTTPS 地址** | `https://1499488717-cndmzvtany.ap-shanghai.tencentscf.com` |
-| 上传包 | `lead-handler-console.zip`（**不含** `scf_bootstrap`） |
+| 上传包 | `lead-handler-console.zip`（**不含** `scf_bootstrap`）—— 完整路径见下方「📦 包在哪」 |
 | 启动命令 | 见下方「控制台启动命令推荐写法」 |
 | 触发器 | 函数 URL：公网访问开启、授权类型「开放」、**CORS 不启用** |
 
@@ -62,17 +62,30 @@
 > 用事件函数 + HTTP 触发器也行（`exports.main` 入口，不需要启动命令）；
 > 本包两种形态都能跑：**事件函数走 `index.js`，Web 函数走 `server.js` + `scf_bootstrap`**。
 
+### 📦 包在哪（绝对路径，别再翻历史记录找）
+
+zip 是**构建产物，不入库**（`.gitignore` 里有 `deploy/scf/*.zip`），所以 clone 下来的仓库里
+**找不到 zip 是正常的**，需要本地打包生成。
+
+| 包 | 绝对路径 | 大小 |
+|---|---|---|
+| ✅ **上传用这个** | `C:\Users\Jiuze\WorkBuddy\官网-新字节航空\nbyte-air-main\deploy\scf\lead-handler-console.zip` | 6158 B |
+| 备选 | `C:\Users\Jiuze\WorkBuddy\官网-新字节航空\nbyte-air-main\deploy\scf\lead-handler.zip` | 6958 B |
+| 桌面副本（直接拖进控制台） | `C:\Users\Jiuze\Desktop\lead-handler-console.zip` | 6158 B |
+
+本地重新生成：
+
+```bash
+cd "C:/Users/Jiuze/WorkBuddy/官网-新字节航空/nbyte-air-main/deploy/scf"
+python pack.py                # 生成 lead-handler.zip（含 scf_bootstrap，755）
+python pack.py --no-bootstrap  # 生成 lead-handler-console.zip（不含 scf_bootstrap）
+```
+
 ### ⚠️ 打包必须用 `pack.py`，不能用 Compress-Archive
 
 Windows 的 `Compress-Archive` **不保留 Unix 可执行权限位**。腾讯云把 `scf_bootstrap`
 当容器启动命令**直接执行**，没有 +x 就会 `Permission denied` → 函数启动失败 →
 网关只返回 502 → 浏览器判定跨域失败，表单永远提交不上去。
-
-```bash
-cd deploy/scf
-python pack.py                # 生成 lead-handler.zip（含 scf_bootstrap，755）
-python pack.py --no-bootstrap  # 生成 lead-handler-console.zip（不含 scf_bootstrap）
-```
 
 | 包 | 内容 | 用途 |
 |---|---|---|
@@ -147,7 +160,7 @@ export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif
    | 地域 | 广州 / 上海 |
    | 运行环境 | **Nodejs 18.x** |
    | 时区 | **Asia/Shanghai（北京时间）** |
-   | 提交方法 | **通过 zip 上传 zip 包** → 选 `deploy/scf/lead-handler-console.zip` |
+   | 提交方法 | **通过 zip 上传 zip 包** → 选 `C:\Users\Jiuze\WorkBuddy\官网-新字节航空\nbyte-air-main\deploy\scf\lead-handler-console.zip` |
    | 启动命令 | 见上方推荐写法（包内无 scf_bootstrap，这栏生效） |
    | 资源类型 / 内存 / 超时 | CPU / 256MB / 10 秒 |
 
