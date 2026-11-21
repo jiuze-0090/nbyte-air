@@ -34,7 +34,7 @@ export default function Hero() {
             专业多旋翼无人机
             <br />
             <span className="bg-gradient-to-r from-nbyte-200 to-accent-cyan bg-clip-text text-transparent">
-              驾驶员培训基地
+              驾驶员执照培训与实训
             </span>
           </h1>
 

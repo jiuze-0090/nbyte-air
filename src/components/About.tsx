@@ -15,7 +15,7 @@ export default function About() {
             </h2>
             <p className="mt-6 text-base leading-relaxed text-gray-600">
               新字节航空致力于无人机人才培养与技术服务。我们不仅提供专业的
-              CAAC 无人机执照培训，还具备专业的无人机设备组装与出口能力，
+              CAAC 无人机执照考前培训，还具备专业的无人机设备组装与出口能力，
               是行业内的技术先行者。
             </p>
 

@@ -31,7 +31,7 @@ export default function Footer() {
               <span className="text-lg font-bold text-white">新字节航空 Nbyte Air</span>
             </div>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-nbyte-300/70">
-              潍坊 CAAC 无人机驾驶员培训基地。理论到实操一站式培养，并提供设备组装与出口服务。
+              潍坊无人机驾驶员执照培训与实训基地。理论到实操一站式培养，并提供设备组装与出口服务。
             </p>
             <div className="mt-5 flex items-start gap-2.5 text-sm text-nbyte-300/80">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-cyan" />
@@ -141,7 +141,7 @@ export default function Footer() {
         {/* 版权行 */}
         <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-nbyte-400 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} 新字节航空 Nbyte Air · 山东新字节航空科技有限公司 · 专业的多旋翼无人机驾驶员培训基地
+            © {year} 新字节航空 Nbyte Air · 山东新字节航空科技有限公司 · 专业的多旋翼无人机驾驶员执照培训与实训基地
           </p>
           {ICP_NUMBER && (
             <p>
