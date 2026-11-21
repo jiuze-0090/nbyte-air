@@ -142,7 +142,9 @@ function pushWecom(lead) {
   const content = [
     '**新线索 · 官网课程咨询**',
     `> 称呼：${lead.name}`,
-    `> 手机：${lead.phoneMasked}`,
+    // 企微群内全是招生顾问，拿到号码才能联系上 → 推完整号码。
+    // 脱敏只保留在函数日志里（控制台日志权限宽、会长期留存）。
+    `> 手机：${lead.phone}`,
     `> 意向：${lead.intent}`,
     lead.message ? `> 留言：${lead.message}` : '',
     `> 来源：${lead.source}`,
@@ -295,7 +297,8 @@ exports.main = async (event) => {
     phoneMasked: maskPhone(phone),
     intent: intent || '未填',
     message,
-    source: String(body.source || '').slice(0, 200),
+    // 官网表单必带 source（window.location.href）；为空说明不是从表单来的
+    source: String(body.source || '').slice(0, 200) || '（未带来源，非表单提交）',
     consent,
     ip,
     time: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
