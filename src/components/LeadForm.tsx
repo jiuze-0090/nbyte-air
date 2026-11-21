@@ -329,7 +329,7 @@ export default function LeadForm() {
           <span>
             我已阅读并同意
             <a
-              href="/privacy.html"
+              href="/privacy"
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold text-nbyte-600 underline underline-offset-2 hover:text-nbyte-700"
@@ -362,7 +362,7 @@ export default function LeadForm() {
       <p className="mt-3 text-xs leading-relaxed text-gray-500">
         提交即表示你已阅读并同意
         <a
-          href="/privacy.html"
+          href="/privacy"
           target="_blank"
           rel="noopener noreferrer"
           className="text-nbyte-600 underline underline-offset-2 hover:text-nbyte-700"
