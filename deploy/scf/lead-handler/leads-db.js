@@ -52,6 +52,13 @@ function normalizePhone(phone) {
   return p;
 }
 
+/** 手机号脱敏：138****0090。管理端列表显示这个，不显示明文也不显示密文 */
+function maskPhone(phone) {
+  const p = String(phone || '');
+  if (p.length !== 11) return p.slice(0, 3) + '****';
+  return p.slice(0, 3) + '****' + p.slice(7);
+}
+
 /**
  * 手机号加密存储（AES-256-GCM）。
  * 密钥缺失时返回空串——宁可让字段为空，也不要退化成明文落库。
@@ -149,6 +156,8 @@ async function saveToDatabase(lead) {
     name: lead.name,
     // 加密存储；密钥缺失时留空，绝不退化成明文
     phone_cipher: encryptPhone(normalized),
+    // 脱敏串：管理端列表显示这个（够顾问识别，又不是可用的手机号）
+    phone_masked: maskPhone(normalized),
     phone_hash: phoneHash(normalized),
     intent: lead.intent || '未填',
     message: lead.message || '',
@@ -186,4 +195,5 @@ module.exports = {
   normalizePhone,
   encryptPhone,
   phoneHash,
+  maskPhone,
 };

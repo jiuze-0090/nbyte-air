@@ -13,7 +13,7 @@
  */
 const path = require('path');
 
-const { normalizePhone, encryptPhone, phoneHash, saveToDatabase } = require(
+const { normalizePhone, encryptPhone, phoneHash, maskPhone, saveToDatabase } = require(
   path.join(__dirname, 'leads-db.js'),
 );
 
@@ -52,6 +52,11 @@ function check(label, ok, extra) {
   check('哈希稳定（去重用）', phoneHash('13800138000') === phoneHash('13800138000'));
   check('哈希不含明文号码', !phoneHash('13800138000').includes('13800138000'));
   check('不同号码哈希不同', phoneHash('13800138000') !== phoneHash('13800138001'));
+
+  // 脱敏串：管理端列表显示这个
+  check('脱敏保留前 3 后 4 位', maskPhone('13800138000') === '138****8000');
+  check('脱敏不含完整号码', !maskPhone('13800138000').includes('13800138000'));
+  check('脱敏长度固定 11', maskPhone('13800138000').length === 11);
 
   // 密钥缺失时必须留空，不能退化成明文
   delete process.env.LEAD_PHONE_SECRET;
