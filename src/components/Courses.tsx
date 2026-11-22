@@ -1,3 +1,4 @@
+import { ChevronRight, Phone } from 'lucide-react';
 import { courseFacts, courseModules, applicationIcons } from '@/data';
 
 export default function Courses() {
@@ -17,8 +18,55 @@ export default function Courses() {
           </p>
         </div>
 
+        {/* 30 秒速览：先把学员最关心的几件事说清楚，细节往下看 */}
+        <div className="mx-auto mt-12 max-w-5xl rounded-2xl border border-nbyte-100 bg-white p-6 shadow-sm ring-1 ring-gray-100 sm:p-8">
+          <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-10">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-nbyte-500">
+                30 秒速览
+              </p>
+              <h3 className="mt-2 text-xl font-bold leading-snug text-nbyte-900 sm:text-2xl">
+                想考证，先看这三件事
+              </h3>
+              <p className="mt-2.5 text-sm leading-relaxed text-gray-600">
+                理论到实操全程带飞，考取 CAAC 民用无人驾驶航空器操控员执照，全国通用、可在民航局平台查验。
+              </p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <button
+                  onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-accent-orange px-5 py-2.5 text-sm font-semibold text-[#1A1A1A] transition-all hover:bg-[#E8551F]"
+                >
+                  咨询开班和学费
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+                <a
+                  href="tel:15610090090"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 px-5 py-2.5 text-sm font-semibold text-nbyte-800 transition-colors hover:border-nbyte-500 hover:text-nbyte-600 sm:hidden"
+                >
+                  <Phone className="h-4 w-4" />
+                  直接打电话
+                </a>
+              </div>
+            </div>
+            <ol className="space-y-2.5">
+              {[
+                '拿什么证：CAAC 操控员执照，视距内 / 超视距全等级覆盖',
+                '怎么学：理论授课 + 真机实操 + 教员一对一带飞',
+                '谁认账：民航局颁发，全国通用，官网平台可查验',
+              ].map((point, i) => (
+                <li key={point} className="flex gap-3 rounded-lg bg-gray-50 px-4 py-3">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-nbyte-100 text-xs font-bold text-nbyte-700">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm leading-relaxed text-gray-700">{point}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
         {/* Course Facts：意向学员真正会问的几件事 */}
-        <div className="mt-12 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-gray-100 lg:p-9">
+        <div className="mt-8 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-gray-100 lg:p-9">
           <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             {courseFacts.map((fact) => {
               const Icon = fact.icon;

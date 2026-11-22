@@ -179,7 +179,7 @@ export type EcosystemLink = {
 export const ecosystemLinks: EcosystemLink[] = [
   {
     title: '低空原理实验室',
-    desc: '10 个交互实验 · 106 条考点索引 · 5 张原理速查卡',
+    desc: '10 个交互实验 · 236 个考点题号 · 12 张规章速查卡',
     href: 'https://lab.nbyteair.com/',
     tag: '免费公开',
     action: '前往实验室',
