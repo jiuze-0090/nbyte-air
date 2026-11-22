@@ -1,8 +1,8 @@
 const stats = [
-  { value: '3+', unit: '年', label: '深耕无人机行业，专注培训与技术服务' },
-  { value: '500+', unit: '名', label: '累计培训学员，覆盖全国多省市' },
-  { value: 'CAAC', unit: '', label: '持民航局运营合格证，执照全国通用、官网可查' },
-  { value: '20+', unit: '家', label: '合作企业与就业推荐单位' },
+  { value: '2025', unit: '年', label: '开班至今，持证运营，专注无人机驾驶员执照培训与技术服务' },
+  { value: '2', unit: '名', label: 'CAAC 持证教员，理论到实操全程带飞' },
+  { value: 'CAAC', unit: '', label: '持民航局运营合格证，执照全国通用，可在民航局平台查验' },
+  { value: '2', unit: '类', label: '经营种类含载货类与培训类，承接河道堤防巡查等作业任务' },
 ];
 
 export default function Stats() {
@@ -34,8 +34,8 @@ export default function Stats() {
         <div className="mt-12 border-t border-nbyte-800/60 pt-8 text-center">
           <p className="mx-auto max-w-3xl text-sm leading-relaxed text-nbyte-300/70">
             山东新字节航空科技有限公司持有民航局《民用无人驾驶航空器运营合格证》
-            <span className="font-medium text-nbyte-200">（UMOC-0-HQ-20250507079）</span>
-            ，经营种类含培训类，有效期 2025-05 至 2027-05，可在民航局 UOM 平台查询。
+            <span className="font-medium text-nbyte-200">（UAOC-O-HQ-20250507079）</span>
+            ，经营种类含载货类与培训类，有效期 2025-05 至 2027-05，可在民航局 UOM 平台查询。
           </p>
           <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-nbyte-300/60">
             执照由民航局颁发，理论与实操考试的报名受理、学籍登记由民航局授权培训机构统一办理；
