@@ -3,7 +3,7 @@
 官网（Cloudflare Pages）提交的咨询表单，由这个函数接收并落地。
 
 ```
-官网表单 ──POST──▶ SCF 函数 ──┬──▶ CloudBase 数据库（leads 集合，可选）
+官网表单 ──POST──▶ SCF 函数 ──┬──▶ 云数据库 leads 表（可选）
                               └──▶ 企业微信群机器人（顾问手机立刻收到）
 ```
 
@@ -164,8 +164,10 @@ export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif
 ### ⚠️ 不要在 package.json 里声明依赖
 
 声明了依赖，云端启动阶段可能执行 `npm install`，装不上或网络不通就一直卡着 →
-容器起不来 → 502。本包**已移除 `@cloudbase/node-sdk`**，启动零外部依赖。
-数据库是可选功能，代码里已优雅降级（找不到模块就跳过落库，只发企微通知）。
+容器起不来 → 502。本包**零外部依赖**，只用 Node 内置的 `https` 与 `crypto`。
+
+落库走的是 **WorkBuddy 云数据库的 REST 通道**（原生 https 请求，无 SDK），
+实现见 `leads-db.js`。不是腾讯云 CloudBase——两者的库不是同一个实例。
 
 ### 创建与配置
 
@@ -183,22 +185,30 @@ export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif
    | 启动命令 | 见上方推荐写法（包内无 scf_bootstrap，这栏生效） |
    | 资源类型 / 内存 / 超时 | CPU / 256MB / 10 秒 |
 
-4. 点「下一步」→ **环境变量**页，点「添加环境变量」，加三条（**不要加空的**）：
+4. 点「下一步」→ **环境变量**页，点「添加环境变量」，加这几条（**不要加空的**）：
 
-   | 变量名 | 值 |
-   |---|---|
-   | `CORS_ORIGINS` | `https://www.nbyteair.com`（实验室也要用就补 `,https://lab.nbyteair.com`） |
-   | `WECOM_WEBHOOK` | 第一步复制的 Webhook 地址 |
-   | `LEAD_COLLECTION` | `leads`（可改，不建数据库就无所谓） |
-   | `REQUIRE_CONSENT` | 可选。默认 `true`（未取得告知同意一律拒收）；紧急回滚时才设 `false` |
+   | 变量名 | 值 | 必填 |
+   |---|---|---|
+   | `CORS_ORIGINS` | `https://www.nbyteair.com`（实验室也要用就补 `,https://lab.nbyteair.com`） | 是 |
+   | `WECOM_WEBHOOK` | 第一步复制的 Webhook 地址 | 是 |
+   | `WB_ENDPOINT` | `https://mp-api.app.workbuddy.host`（云库数据面地址） | 落库必填 |
+   | `WB_ACCESS_KEY` | 小程序 `config/index.js` 里的 `publishableKey`（`wbpk_` 开头那串） | 落库必填 |
+   | `LEAD_PHONE_SECRET` | 自己定的手机号加密密钥，**换密钥等于旧数据无法解密**，定下就别改 | 落库必填 |
+   | `WB_ORG_CODE` | `UAV-NEWSKY`（一般不用改） | 否 |
+   | `LEADS_TABLE` | `leads`（一般不用改） | 否 |
+   | `CONSENT_TEXT_VERSION` | `v1`（告知书版本号，改版时递增） | 否 |
+   | `REQUIRE_CONSENT` | 可选。默认 `true`（未取得告知同意一律拒收）；紧急回滚时才设 `false` | 否 |
 
    > 环境变量的 key/value 只能含字母数字下划线，长度 2–64 字节，不能有中文和特殊符号。
    > 控制台默认自带一条 `TZ=Asia/Shanghai`（对应时区设置），**那一条别动**。
    > `WECOM_SECRET` 只在机器人配了「安全密钥」时才需要；没配就别加这行
    > （控制台的 value **不能留空**，留空就整行删掉）。
    >
-   > **关于依赖**：本包已不含任何 npm 依赖。云端若没有数据库 SDK，函数会**自动跳过落库**，
-   > 只发企微通知——**不影响收线索**。所以「不建 CloudBase 也能用」是设计好的，不是坑。
+   > **不配落库的三条也能跑**：函数会自动跳过落库，只发企微通知——**不影响收线索**。
+   > 这是设计好的降级，不是坑。配了才会写进 `leads` 表。
+   >
+   > **认证头不是 `apikey`**：云库 REST 通道要的是 `x-wb-webapp-access-key`，
+   > 用 `apikey` 会返回 `invalid_client`。`leads-db.js` 里已经用对了。
 
 5. 点「完成」创建。
 
@@ -236,14 +246,38 @@ export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif
    ```
    返回 `{"ok":true,...}` 且企微群收到消息 = 通了。
 
-## 四、（可选）建 CloudBase 集合存历史线索
+## 四、（可选）把线索存进云数据库
 
-1. 腾讯云控制台 → 云开发 CloudBase → 新建环境（和云函数同地域）
-2. 「数据库」→ 新建集合 `leads`
-3. 函数环境变量加一条 `SCF_NAMESPACE` = 你的环境 ID
-4. 重新部署函数（改完环境变量要「函数代码」页点「部署」才生效）
+`leads` 表已在 WorkBuddy 云数据库里建好（含 RLS 策略与索引），**不需要你在控制台建任何东西**。
+想让线索进库，只需在函数环境变量补三条：
 
-没建 CloudBase 也能跑：函数会自动跳过落库，只发企微通知。
+| 变量名 | 值 |
+|---|---|
+| `WB_ENDPOINT` | `https://mp-api.app.workbuddy.host` |
+| `WB_ACCESS_KEY` | 小程序 `config/index.js` 里的 `publishableKey`（`wbpk_` 开头那串） |
+| `LEAD_PHONE_SECRET` | 自己定的手机号加密密钥（定下就别改，换密钥等于旧数据无法解密） |
+
+配完重新部署函数（改完环境变量要「函数代码」页点「部署」才生效）。
+
+不配也能跑：函数会自动跳过落库，只发企微通知——不影响收线索。
+
+**落库规则**（由数据库 RLS 强制，不是靠代码自觉）：
+
+| 规则 | 效果 |
+|---|---|
+| `consent_at` 非空 | 没勾选告知同意 → 数据库直接拒收该行 |
+| `source_type` 固定 `form` | 别的来源的号码塞不进来 |
+| `phone_cipher` AES-256-GCM 加密 | 库里看不到明文手机号 |
+| `phone_hash` SHA-256 | 同一号码跨格式（+86、空格、横线）哈希一致，可做去重 |
+| 只有员工身份能读 | 游客与学员读不到线索表 |
+
+自测：
+
+```bash
+node deploy/scf/lead-handler/test-leads-db.js
+```
+
+（纯函数部分 11 项必过；配置了凭据后会真写一条 `落库自测-*` 记录，记得清理。）
 
 ## 五、接到官网上（**两处都要配**）
 
@@ -301,7 +335,7 @@ endpoint: import.meta.env.VITE_LEAD_ENDPOINT || 'https://你的函数URL',
 打开官网提交一次表单，确认三件事：
 1. 页面提示「**已收到，顾问今天内联系你**」（不是「咨询信息已复制」）
 2. 企微群收到一条 markdown 消息，含姓名、手机号、意向课程
-3. （建了 CloudBase 的话）`leads` 集合多一条记录
+3. （配了落库环境变量的话）`leads` 表多一条记录
 
 ## 七、排错
 
@@ -343,7 +377,7 @@ P_NAME="预览样例" P_PHONE="13812345678" P_INTENT="多旋翼视距内执照" 
   脱敏等于线索作废。《学员咨询信息处理告知书》第三节已写明「由招生顾问人工查看，
   并通过企业内部办公工具传递给你指定的联系人」——企微群就是这个「企业内部办公工具」。
 - **函数日志里手机号仍脱敏**（`138****0090`）：控制台日志权限宽、且会长期留存，不放完整号码。
-  完整号码只出现在两个地方：企微群消息、CloudBase 数据库。
+  完整号码只出现在两个地方：企微群消息、云数据库（且是加密后的密文，不是明文）。
 - 收集的是手机号 + 称呼 + 意向课程；官网表单下方已加「仅用于课程咨询联系，不对外提供」
   （《个人信息保护法》要求告知用途，**这句不能删**）
 - 限流：同一 IP 60 秒内最多 3 次（函数内存级，实例重启会重置，够挡住手抖和简单刷量）

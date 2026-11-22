@@ -19,12 +19,13 @@ import zipfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "lead-handler")
 
-FILES = ["index.js", "server.js", "scf_bootstrap", "package.json"]
+FILES = ["index.js", "leads-db.js", "server.js", "scf_bootstrap", "package.json"]
 
 # 0o100755 = 普通文件 + 755；0o100644 = 普通文件 + 644
 MODES = {
     "scf_bootstrap": 0o100755,
     "index.js": 0o100644,
+    "leads-db.js": 0o100644,
     "server.js": 0o100644,
     "package.json": 0o100644,
 }

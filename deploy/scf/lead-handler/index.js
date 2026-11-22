@@ -10,7 +10,9 @@
  * 环境变量（函数配置里加）：
  *   CORS_ORIGINS   允许访问的站点，逗号分隔。默认只放官网
  *   WECOM_WEBHOOK  企业微信群机器人 Webhook 地址（企微群 → 群机器人 → 复制地址）
- *   LEAD_COLLECTION CloudBase 集合名，默认 leads
+ *   WB_ENDPOINT    WorkBuddy 云库数据面地址（落库用，见 leads-db.js）
+ *   WB_ACCESS_KEY  云库 publishableKey（落库用）
+ *   LEAD_PHONE_SECRET 手机号加密密钥（落库用，必填，否则手机号不落库）
  *   REQUIRE_CONSENT 默认 true：未取得「告知同意」的提交一律拒收。
  *                   紧急回滚时可设 'false' 临时放宽。
  *
@@ -18,11 +20,13 @@
  *   consent  前端勾选《学员咨询信息处理告知书》后传 true
  *   hp       蜜罐字段，真人不可见；非空即判定为脚本提交并丢弃
  *
- * 隐私：日志与企微通知里手机号脱敏（138****0090），完整号码只进数据库。
+ * 隐私：日志与企微通知里手机号脱敏（138****0090），完整号码只进数据库；
+ *       数据库里手机号也是加密存储（AES-256-GCM），另存哈希用于去重。
  */
 
 const https = require('https');
 const crypto = require('crypto');
+const { saveToDatabase } = require('./leads-db');
 
 const PHONE_RE = /^1[3-9]\d{9}$/;
 const NAME_MAX = 40;
@@ -40,7 +44,8 @@ const ALLOWED_ORIGINS = (process.env.CORS_ORIGINS || 'https://www.nbyteair.com')
 
 const WECOM_WEBHOOK = process.env.WECOM_WEBHOOK || '';
 const WECOM_SECRET = process.env.WECOM_SECRET || ''; // 可选：机器人的安全密钥
-const COLLECTION = process.env.LEAD_COLLECTION || 'leads';
+// 落库配置在 leads-db.js 里读：WB_ENDPOINT / WB_ACCESS_KEY / WB_ORG_CODE /
+// LEADS_TABLE / LEAD_PHONE_SECRET / CONSENT_TEXT_VERSION
 // 未取得「告知同意」的提交一律拒收（《个人信息保护法》第十三条）。
 // 紧急回滚可设成 'false' 临时放宽，但那只应作为应急手段。
 const REQUIRE_CONSENT = process.env.REQUIRE_CONSENT !== 'false';
@@ -102,28 +107,9 @@ function parseBody(event) {
   }
 }
 
-/** 写 CloudBase；SDK 不可用或写入失败时返回 false，不阻断主流程 */
-async function saveToDatabase(lead) {
-  try {
-    const tcb = require('@cloudbase/node-sdk');
-    const env =
-      process.env.SCF_NAMESPACE ||
-      process.env.TCB_ENV ||
-      process.env.TENCENTCLOUD_ENVID ||
-      process.env.ENV;
-    if (!env) return false;
-    const app = tcb.init({ env });
-    const db = app.database();
-    await db.collection(COLLECTION).add({
-      ...lead,
-      createdAt: new Date().toISOString(),
-      source: 'www.nbyteair.com',
-    });
-    return true;
-  } catch (e) {
-    console.error('[lead] CloudBase 写入失败：', e && e.message);
-    return false;
-  }
+/** 写 WorkBuddy 云数据库；缺配置或写入失败时返回 false，不阻断主流程 */
+async function writeLead(lead) {
+  return saveToDatabase(lead);
 }
 
 /**
@@ -304,7 +290,7 @@ exports.main = async (event) => {
     time: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
   };
 
-  const saved = await saveToDatabase(lead);
+  const saved = await writeLead(lead);
   const notified = await pushWecom(lead);
 
   // 至少通知成功就算收到（数据库失败时顾问仍能看到线索）
