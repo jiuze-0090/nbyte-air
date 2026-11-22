@@ -14,7 +14,7 @@
 | 函数名 | `nbyte-lead-handler-v2` |
 | 地域 / 运行时 / 时区 | 上海 / Nodejs 18.15 / Asia/Shanghai |
 | **公网 HTTPS 地址** | `https://1499488717-cndmzvtany.ap-shanghai.tencentscf.com` |
-| 上传包 | `lead-handler-console.zip`（**不含** `scf_bootstrap`）—— 完整路径见下方「📦 包在哪」 |
+| 上传包（**更新**这个已建函数） | `lead-handler.zip`（**含** `scf_bootstrap`，755）—— 完整路径见下方「📦 包在哪」。<br>⚠️ `console.zip` 只用于**新建**函数，更新会失败，见下方「🔴」段 |
 | 启动命令 | 见下方「控制台启动命令推荐写法」 |
 | 触发器 | 函数 URL：公网访问开启、授权类型「开放」、**CORS 不启用** |
 
@@ -69,9 +69,8 @@ zip 是**构建产物，不入库**（`.gitignore` 里有 `deploy/scf/*.zip`）�
 
 | 包 | 绝对路径 | 大小 |
 |---|---|---|
-| ✅ **上传用这个** | `C:\Users\Jiuze\WorkBuddy\官网-新字节航空\nbyte-air-main\deploy\scf\lead-handler-console.zip` | 6158 B |
-| 备选 | `C:\Users\Jiuze\WorkBuddy\官网-新字节航空\nbyte-air-main\deploy\scf\lead-handler.zip` | 6958 B |
-| 桌面副本（直接拖进控制台） | `C:\Users\Jiuze\Desktop\lead-handler-console.zip` | 6158 B |
+| ✅ **更新已有函数，传这个** | `C:\Users\Jiuze\WorkBuddy\官网-新字节航空\nbyte-air-main\deploy\scf\lead-handler.zip` | 含 scf_bootstrap |
+| 仅**新建**函数用 | `C:\Users\Jiuze\WorkBuddy\官网-新字节航空\nbyte-air-main\deploy\scf\lead-handler-console.zip` | 无 scf_bootstrap |
 
 本地重新生成：
 
@@ -89,8 +88,8 @@ Windows 的 `Compress-Archive` **不保留 Unix 可执行权限位**。腾讯云
 
 | 包 | 内容 | 用途 |
 |---|---|---|
-| `lead-handler.zip` | 4 个文件，scf_bootstrap=755 | 常规上传 |
-| **`lead-handler-console.zip`** | 3 个文件，**无 scf_bootstrap** | ✅ **推荐**：让**控制台的启动命令接管**——由腾讯云生成 scf_bootstrap，权限由它保证，绕开 zip 丢执行位的问题。**已验证可用的就是这个包** |
+| **`lead-handler.zip`** | 4 个文件，scf_bootstrap=755 | ✅ **更新已有函数必须传这个**（当前场景）。启动命令会被忽略，以包内 bootstrap 为准 |
+| `lead-handler-console.zip` | 3 个文件，**无 scf_bootstrap** | 仅**新建**函数时用：让控制台启动命令接管，由腾讯云生成 bootstrap。拿它更新已有函数会报 `filename not matched: scf_bootstrap` |
 
 | 项 | 说明 |
 |---|---|
@@ -181,8 +180,8 @@ export PORT=9000; if [ -f /var/user/src/server.js ]; then cd /var/user/src; elif
    | 地域 | 广州 / 上海 |
    | 运行环境 | **Nodejs 18.x** |
    | 时区 | **Asia/Shanghai（北京时间）** |
-   | 提交方法 | **通过 zip 上传 zip 包** → 选 `C:\Users\Jiuze\WorkBuddy\官网-新字节航空\nbyte-air-main\deploy\scf\lead-handler-console.zip` |
-   | 启动命令 | 见上方推荐写法（包内无 scf_bootstrap，这栏生效） |
+   | 提交方法 | **通过 zip 上传 zip 包** → 选 `C:\Users\Jiuze\WorkBuddy\官网-新字节航空\nbyte-air-main\deploy\scf\lead-handler.zip`（4 文件，含 scf_bootstrap） |
+   | 启动命令 | 包内有 scf_bootstrap，控制台这栏会被忽略；沿用已配置的值即可，无需改动 |
    | 资源类型 / 内存 / 超时 | CPU / 256MB / 10 秒 |
 
 4. 点「下一步」→ **环境变量**页，点「添加环境变量」，加这几条（**不要加空的**）：
@@ -288,7 +287,7 @@ node deploy/scf/lead-handler/test-leads-db.js
 ```
 1️⃣ 先部署官网前端（带勾选框 + privacy.html）  ← 必须先
 2️⃣ 确认线上 www.nbyteair.com 的表单里已经有勾选框
-3️⃣ 再上传新的 lead-handler-console.zip 并部署云函数
+3️⃣ 再上传新的 lead-handler.zip（含 scf_bootstrap）并部署云函数
 ```
 
 顺序反了会怎样：旧官网（无勾选框）提交 → 没有 consent 字段 → 云函数返回 400
@@ -341,7 +340,7 @@ endpoint: import.meta.env.VITE_LEAD_ENDPOINT || 'https://你的函数URL',
 
 | 现象 | 原因 |
 |---|---|
-| **表单一直显示「网络有点问题，暂时没提交成功」** | **502**：函数没起来。① 包里的 `scf_bootstrap` 用相对路径找不到 `server.js`（代码在 `src/` 下）② zip 丢了 755 执行位 ③ `npm install` 卡死 ④ 端口不是 9000。→ 改用 `lead-handler-console.zip` + 控制台启动命令 |
+| **表单一直显示「网络有点问题，暂时没提交成功」** | **502**：函数没起来。① 传错包（更新已有函数却传了 `console.zip`）② 包里的 `scf_bootstrap` 用相对路径找不到 `server.js`（代码在 `src/` 下）③ zip 丢了 755 执行位 ④ `npm install` 卡死 ⑤ 端口不是 9000。→ 先确认传的是 **4 文件的 `lead-handler.zip`**；仅**新建**函数时才改用 `console.zip` + 控制台启动命令 |
 | **提交返回 `consent required`（400）** | 官网前端还没部署带勾选框的版本，或用户没勾选。→ 先部署官网前端；紧急回滚加环境变量 `REQUIRE_CONSENT=false` |
 | **提交返回 `invalid request`（400）** | 蜜罐字段 `hp` 非空，被判定为脚本提交并丢弃。真人不该碰到这个——先查前端有没有误把蜜罐渲染成可见输入框 |
 | 浏览器控制台报 CORS 错误 | ① `CORS_ORIGINS` 没写全（要 `https://` + 域名，无路径无尾斜杠）② 控制台的 CORS 又开了，导致头重复 —— 关掉控制台那个 |
