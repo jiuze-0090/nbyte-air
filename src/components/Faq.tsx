@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 import { faqItems } from '@/data';
@@ -6,32 +5,11 @@ import { faqItems } from '@/data';
 /**
  * 常见问题
  * ---------------------------------------------------------------------------
- * 用原生 <details>/<summary> 实现折叠：无需 JS 状态，答案始终在 DOM 中，
- * 搜索引擎可直接抓取。同时输出 FAQPage 结构化数据，争取富摘要。
+ * 用原生 <details>/<summary> 实现折叠：无需 JS 状态，答案始终在 DOM 中。
+ * FAQPage 结构化数据已静态写入 index.html 的 <head>（非渲染爬虫可读），
+ * 这里不再运行时重复注入，避免页面出现两份 FAQPage schema。
  */
 export default function Faq() {
-  useEffect(() => {
-    const jsonLd = {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: faqItems.map((item) => ({
-        '@type': 'Question',
-        name: item.q,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: item.a,
-        },
-      })),
-    };
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.text = JSON.stringify(jsonLd);
-    document.head.appendChild(script);
-    return () => {
-      script.remove();
-    };
-  }, []);
-
   return (
     <section id="faq" className="bg-white py-24">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">

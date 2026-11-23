@@ -1,4 +1,32 @@
+# 新字节航空官网 robots.txt
+# 默认全部放行
 User-agent: *
+Allow: /
+
+# --- SEO/GEO P0：显式放行主流 AI 搜索与训练爬虫 ---
+# 说明：Allow: * 已覆盖这些 UA，此处显式列出便于审计与日后核对爬虫日志。
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Google-Extended
 Allow: /
 
 # 本站为单页站点，所有可索引内容均在首页锚点内。
