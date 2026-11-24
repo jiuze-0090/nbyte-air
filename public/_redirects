@@ -1,0 +1,4 @@
+# Cloudflare Pages 重写规则
+# 告知书：CF Pages 的 SPA fallback 与 Pretty URLs 会拦截 /privacy，显式映射到产物文件
+/privacy   /privacy/index.html   200
+/privacy/  /privacy/index.html   200
