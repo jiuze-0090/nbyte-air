@@ -1,8 +1,8 @@
 const stats = [
-  { value: '2025', unit: '年', label: '开班至今，持证运营，专注无人机驾驶员执照培训与技术服务' },
-  { value: '2', unit: '名', label: 'CAAC 持证教员，理论到实操全程带飞' },
   { value: 'CAAC', unit: '', label: '持民航局运营合格证，执照全国通用，可在民航局平台查验' },
-  { value: '2', unit: '类', label: '经营种类含载货类与培训类，承接河道堤防巡查等作业任务' },
+  { value: '真机', unit: '实操', label: '持证教员全程带飞，从理论到实飞手把手教' },
+  { value: '载货', unit: '培训', label: '经营种类含载货类与培训类，承接河道堤防巡查等作业任务' },
+  { value: '实训', unit: '基地', label: '理论、模拟、真机一站式完成，学完就能上手' },
 ];
 
 export default function Stats() {
