@@ -34,6 +34,7 @@ export const navLinks = [
   { label: '培训课程', id: 'courses' },
   { label: '实训基地', id: 'base' },
   { label: '关于我们', id: 'about' },
+  { label: '教学团队', id: 'team' },
   { label: '常见问题', id: 'faq' },
   { label: '联系我们', id: 'contact' },
   { label: '学习资源', id: 'resources' },
@@ -97,6 +98,62 @@ export const aboutHighlights = [
   { icon: Cog, title: '设备组装与出口', desc: '专业组装能力，面向国内外市场' },
   { icon: Award, title: '本地自有团队', desc: '教研与教员常驻潍坊，课程与设备问题当场解决' },
 ];
+
+/**
+ * 教学团队展示栏
+ * ---------------------------------------------------------------------------
+ * 口径硬约束（改这里前先读 docs/内容硬约束.md）：
+ *   1. role / bio 只写岗位与教学方向，禁止编造获奖、协会职务、政府聘任；
+ *      第三方招生平台的文案未经核验，不得直接照抄。
+ *   2. credentials[] 每条都要有可举证的原件（证书/聘书/公示链接）。
+ *      拿到原件才填；没有就留空数组，页面会自动隐藏该栏，不显示空壳。
+ *   3. 不写「资深/权威/认证考点」等无凭据形容词，不称「训练机构/指定考点」。
+ *
+ * 填值示例（有原件后按此格式加）：
+ *   credentials: [{ label: '2023 潍坊市无人机植保飞手技能大赛 一等奖', year: '2023' }]
+ */
+export type TeamCredential = {
+  /** 完整名称：写全发证机关 + 奖项/职务全称 */
+  label: string;
+  /** 年份或有效期 */
+  year?: string;
+};
+
+export type TeamMember = {
+  /** 姓名或代号 */
+  name: string;
+  /** 岗位：如「教学体系负责人」「航拍方向教员」 */
+  role: string;
+  /** 教学方向，一句客观描述，不堆形容词 */
+  bio: string;
+  /** 有原件的资质/荣誉；空数组 = 不展示该栏 */
+  credentials: TeamCredential[];
+};
+
+export const teamMembers: TeamMember[] = [
+  {
+    name: '宋玖泽',
+    role: '教学体系负责人',
+    bio: '负责理论课程与实验体系建设，主讲飞行原理、操纵与配平、气象与法规。',
+    credentials: [],
+  },
+  {
+    name: '张鑫鹏',
+    role: '航拍方向教员',
+    bio: '负责航拍与影视创作方向教学，覆盖从飞行操作到商业项目流程。',
+    credentials: [],
+  },
+];
+
+/** 体系版本与更新日志：署名确权骨架，内容变更时同步这里 */
+export const systemInfo = {
+  version: 'v1.0',
+  updatedAt: '2026-11',
+  copyrightOwner: '山东新字节航空科技有限公司',
+  changelog: [
+    { date: '2026-11', text: '题库对齐官方核验答案，上线低空原理实验室交互实验' },
+  ],
+};
 
 /**
  * 课程总览：把意向学员真正会问的三件事摆在明面上

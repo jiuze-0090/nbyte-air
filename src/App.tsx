@@ -5,6 +5,7 @@ import Stats from '@/components/Stats';
 import Courses from '@/components/Courses';
 import Base from '@/components/Base';
 import About from '@/components/About';
+import Team from '@/components/Team';
 import Faq from '@/components/Faq';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
@@ -47,6 +48,7 @@ function App() {
         <Courses />
         <Base />
         <About />
+        <Team />
         <Faq />
         <Contact />
       </main>
