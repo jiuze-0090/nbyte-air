@@ -57,6 +57,14 @@ export default function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                <a
+                  href="/weifang-uav-training/"
+                  className="text-sm text-nbyte-300/75 transition-colors hover:text-accent-cyan"
+                >
+                  潍坊无人机培训
+                </a>
+              </li>
             </ul>
           </div>
 

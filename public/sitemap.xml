@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  官网是单页 SPA，只有一个可独立收录的 URL。
-  原先这里还列了 #courses / #base / #about / #contact 四个锚点——fragment 不会产生独立页面，
-  百度与 Google 都不索引锚点，提交上去等于噪音，已移除。
+  官网首页是单页 SPA，锚点不产生独立页面，不提交。
+  长尾落地页为独立静态 HTML，可独立收录，逐条列出。
   实验室（lab.nbyteair.com）是另一个站点，sitemap 独立，见 https://lab.nbyteair.com/sitemap.xml
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.nbyteair.com/</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://www.nbyteair.com/weifang-uav-training/</loc>
+    <lastmod>2026-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
